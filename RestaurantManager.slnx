@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="RestaurantManager.Api/RestaurantManager.Api.csproj" />
+  <Project Path="RestaurantManager.Application/RestaurantManager.Application.csproj" Id="8a4edb38-e550-413f-8e88-ac43818dcb33" />
+  <Project Path="RestaurantManager.Client/RestaurantManager.Client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="RestaurantManager.Domain/RestaurantManager.Domain.csproj" />
+  <Project Path="RestaurantManager.Infrastructure/RestaurantManager.Infrastructure.csproj" Id="45b634cc-ebe3-4b31-891b-80748489350c" />
+</Solution>
