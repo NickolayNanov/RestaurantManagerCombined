@@ -45,7 +45,12 @@ namespace RestaurantManager.Infrastructure
                 .AddDefaultTokenProviders();
 
             services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -81,6 +86,14 @@ namespace RestaurantManager.Infrastructure
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<RestaurantManagerDbContext>();
             dbContext.Database.Migrate();
+
+            if (seedDatabase)
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
+                roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
+            }
 
             return app;
         }

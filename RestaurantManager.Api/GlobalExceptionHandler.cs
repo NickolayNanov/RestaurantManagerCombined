@@ -62,6 +62,16 @@ namespace RestaurantManager.Api
                         Instance = httpContext.Request.Path
                     };
                     break;
+                case InvalidOperationException:
+                    problem = new ProblemDetails
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Title = "Invalid operation",
+                        Type = "https://httpstatuses.com/400",
+                        Detail = exception.Message,
+                        Instance = httpContext.Request.Path
+                    };
+                    break;
 
                 // Example custom exceptions:
                 // case NotFoundException nf:

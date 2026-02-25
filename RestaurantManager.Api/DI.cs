@@ -73,10 +73,9 @@ namespace RestaurantManager.Api
             app.UseSwagger();
             app.UseSwaggerUI();
 
-
             app.UseMiddleware<EfCoreTransactionMiddleware>();
 
-            app.MigrateDatabase();
+            app.MigrateDatabase(true);
 
             app.MapControllers();
 

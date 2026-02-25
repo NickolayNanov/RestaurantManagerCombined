@@ -17,13 +17,15 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
     {
         public async Task<UpdateRestaurantResponse> Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
         {
-            var dbRecord = await restaurantManagerDbContext.Restaurants.FindAsync(request.Id, cancellationToken)
+            var dbRecord = await restaurantManagerDbContext.Restaurants.AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
                 ?? throw new ResourceNotFoundException(nameof(Restaurant), $"Restaurant with id {request.Id} was not found when trying to update.");
 
             var entity = mapper.Map<Restaurant>(request);
 
             entity.UpdatedBy = currentUserService.UserId;
             entity.UpdatedAt = DateTime.UtcNow;
+            entity.CreatedAt = dbRecord.CreatedAt;
+            entity.CreatedBy = dbRecord.CreatedBy;
 
             restaurantManagerDbContext.Restaurants.Update(entity);
 

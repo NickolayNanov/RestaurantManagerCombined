@@ -8,6 +8,7 @@ using RestaurantManager.Application.Handlers.Restaurants.Delete;
 using RestaurantManager.Application.Handlers.Restaurants.GetById;
 using RestaurantManager.Application.Handlers.Restaurants.GetMany;
 using RestaurantManager.Application.Handlers.Restaurants.Update;
+using RestaurantManager.Application.Handlers.Users.Create;
 using RestaurantManager.Domain.Entities;
 
 namespace RestaurantManager.Api.Controllers

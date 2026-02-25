@@ -18,6 +18,8 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Create
             var restaurant = mapper.Map<Restaurant>(request);
 
             restaurant.CreatedBy = currentUserService.UserId;
+            restaurant.CreatedAt = DateTime.UtcNow;
+
             restaurant.OwnerId = currentUserService.UserId;
 
             restaurantManagerDbContext.Restaurants.Add(restaurant);

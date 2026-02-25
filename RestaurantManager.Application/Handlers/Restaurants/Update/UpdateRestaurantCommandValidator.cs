@@ -16,9 +16,8 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
 
             this.RuleFor(x => x.OwnerId)
                 .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
+                .Must(x => x != Guid.Empty)
+                    .When(x => x is not null)
                     .WithMessage(NullOrEmptyMessage);
 
             this.RuleFor(x => x.Name)
@@ -27,9 +26,9 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
                     .WithMessage(NullOrEmptyMessage)
                 .NotEmpty()
                     .WithMessage(NullOrEmptyMessage)
-                .MaximumLength(100)
+                .MaximumLength(50)
                     .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Name), 3, 50))
-                .MinimumLength(100)
+                .MinimumLength(3)
                     .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Name), 3, 50));
 
             this.RuleFor(x => x.Description)
