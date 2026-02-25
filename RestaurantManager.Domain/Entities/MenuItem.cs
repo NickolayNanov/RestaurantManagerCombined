@@ -10,9 +10,9 @@
 
         public bool IsActive { get; set; }
 
-        public string MenuId { get; set; }
+        public Guid MenuId { get; set; }
 
-        public Menu Menu { get; set; }
+        public virtual Menu Menu { get; set; }
 
         public virtual IEnumerable<MenuItemCategory> MenuItemCategories { get; set; } = new HashSet<MenuItemCategory>();
     }

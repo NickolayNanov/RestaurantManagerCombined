@@ -14,7 +14,7 @@
 
         public virtual IEnumerable<MenuItem> MenuItems { get; set; } = new HashSet<MenuItem>();
 
-        public string RestaurantId { get; set; }
+        public Guid RestaurantId { get; set; }
 
         public Restaurant Restaurant { get; set; }
     }

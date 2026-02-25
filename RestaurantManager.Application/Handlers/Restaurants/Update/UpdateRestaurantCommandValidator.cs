@@ -7,6 +7,20 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
     {
         public UpdateRestaurantCommandValidator()
         {
+            this.RuleFor(x => x.Id)
+                .Cascade(CascadeMode.Stop)
+                .NotNull()
+                    .WithMessage(NullOrEmptyMessage)
+                .NotEmpty()
+                    .WithMessage(NullOrEmptyMessage);
+
+            this.RuleFor(x => x.OwnerId)
+                .Cascade(CascadeMode.Stop)
+                .NotNull()
+                    .WithMessage(NullOrEmptyMessage)
+                .NotEmpty()
+                    .WithMessage(NullOrEmptyMessage);
+
             this.RuleFor(x => x.Name)
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
@@ -30,13 +44,6 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
                     .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Description), 1, 200));
 
             this.RuleFor(x => x.ImgUrl)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
-                    .WithMessage(NullOrEmptyMessage);
-
-            this.RuleFor(x => x.OwnerId)
                 .Cascade(CascadeMode.Stop)
                 .NotNull()
                     .WithMessage(NullOrEmptyMessage)

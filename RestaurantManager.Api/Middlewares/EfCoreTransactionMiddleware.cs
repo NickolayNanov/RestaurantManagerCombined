@@ -39,16 +39,23 @@ namespace RestaurantManager.Api.Middlewares
                 {
                     await next(context);
 
-                    // Commit if no exception happened
-                    await db.SaveChangesAsync(context.RequestAborted);
-                    await tx.CommitAsync(context.RequestAborted);
+                    if (context.Response.StatusCode < 400)
+                    {
+                        await db.SaveChangesAsync(context.RequestAborted);
+                        await tx.CommitAsync(context.RequestAborted);
 
-                    logger.LogInformation($"Commited transaction {tx.TransactionId} successfully.");
+                        logger.LogInformation($"Commited transaction {tx.TransactionId} successfully.");
+                    }
+                    else
+                    {
+                        await tx.RollbackAsync(context.RequestAborted);
+                        logger.LogError($"The HTTP request was NOT successful. Rolling back transaction.");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "An error occurred during request processing. Rolling back transaction.");
                     await tx.RollbackAsync(context.RequestAborted);
+                    logger.LogError(ex, "An error occurred during request processing. Rolling back transaction.");
 
                     throw;
                 }

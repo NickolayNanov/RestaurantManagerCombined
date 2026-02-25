@@ -10,6 +10,16 @@ namespace RestaurantManager.Api
     {
         public static IServiceCollection AddWeb(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddProblemDetails(options =>
+            {
+                options.CustomizeProblemDetails = ctx =>
+                {
+                    ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+                };
+            });
+
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+
             services.AddScoped<EfCoreTransactionMiddleware>();
 
             services.AddControllers();
@@ -17,7 +27,7 @@ namespace RestaurantManager.Api
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new() { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new() { Title = "Restaurant Manager API", Version = "v1" });
 
                 // Add JWT Bearer definition
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -42,14 +52,13 @@ namespace RestaurantManager.Api
         // start up configuration of the middlewares pipeline
         public static WebApplication BuildMiddlewaresPipeline(this WebApplication app)
         {
+            app.UseExceptionHandler();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
             }
-
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
 
             app.MapFallbackToFile("index.html");
 
@@ -59,11 +68,11 @@ namespace RestaurantManager.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseIdentityAndRoles();
 
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseIdentityAndRoles();
 
             app.UseMiddleware<EfCoreTransactionMiddleware>();
 

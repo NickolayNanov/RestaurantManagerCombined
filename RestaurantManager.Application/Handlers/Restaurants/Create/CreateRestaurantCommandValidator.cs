@@ -14,7 +14,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Create
                     .WithMessage(NullOrEmptyMessage)
                 .MaximumLength(100)
                     .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Name), 3, 50))
-                .MinimumLength(100)
+                .MinimumLength(3)
                     .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Name), 3, 50));
 
             this.RuleFor(x => x.Description)
