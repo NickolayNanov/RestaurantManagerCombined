@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi;
+﻿using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi;
 using RestaurantManager.Api.Mappings;
 using RestaurantManager.Api.Middlewares;
 using RestaurantManager.Infrastructure;
@@ -46,6 +47,21 @@ namespace RestaurantManager.Api
             // automapper
             services.AddAutoMapper(typeof(RestaurantsPresentationProfile).Assembly);
 
+            services.AddCors(options =>
+             {
+                 var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+                 options.AddPolicy("ClientApp", policy =>
+                 {
+                     policy
+                         .WithOrigins(allowedOrigins)
+                         .AllowAnyMethod()
+                         .AllowAnyHeader()
+                         .AllowCredentials()
+                         .WithExposedHeaders(HeaderNames.WWWAuthenticate);
+                 });
+             });
+
             return services;
         }
 
@@ -68,6 +84,7 @@ namespace RestaurantManager.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("ClientApp");
             app.UseIdentityAndRoles();
 
             app.UseSwagger();

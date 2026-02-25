@@ -8,4 +8,9 @@
         Spring,
         Autumn
     }
+    public enum OpenClosed
+    {
+        Open,
+        Closed
+    }
 }

@@ -41,10 +41,18 @@ namespace RestaurantManager.Api.Middlewares
 
                     if (context.Response.StatusCode < 400)
                     {
-                        await db.SaveChangesAsync(context.RequestAborted);
-                        await tx.CommitAsync(context.RequestAborted);
+                        try
+                        {
+                            await db.SaveChangesAsync(context.RequestAborted);
+                            await tx.CommitAsync(context.RequestAborted);
 
-                        logger.LogInformation($"Commited transaction {tx.TransactionId} successfully.");
+                            logger.LogInformation($"Commited transaction {tx.TransactionId} successfully.");
+                        }
+                        catch
+                        {
+                            await tx.RollbackAsync(context.RequestAborted);
+                            logger.LogError($"Error during commit of transaction.");
+                        }
                     }
                     else
                     {
