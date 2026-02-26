@@ -1,0 +1,280 @@
+{
+  "info": {
+    "_postman_id": "74675ee3-c10d-404c-8af6-c7ee0c6b2a78",
+    "name": "main",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "8532097",
+    "_collection_link": "https://go.postman.co/collection/8532097-74675ee3-c10d-404c-8af6-c7ee0c6b2a78?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "restaurants",
+      "item": [
+        {
+          "name": "Create_Restaurant_200",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Amigos\",\r\n  \"description\": \"test description\",\r\n  \"imgUrl\": \"https://localhost:7122/swagger/index.html\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurants"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update_Restaurant_204",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"fd9ed7f3-3bbf-46d6-7b46-08de745ba03b\",\r\n    \"name\": \"Amigos55\",\r\n    \"description\": \"test 55 description\",\r\n    \"imgUrl\": \"https://localhost:5555/swagger/index.html\",\r\n    \"ownerId\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurants"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List_Restaurants_200",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurants"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetById_Restaurant_200",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/2f17c4d1-055b-4da8-7b47-08de745ba03b",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurants",
+                "2f17c4d1-055b-4da8-7b47-08de745ba03b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete_Restaurants_204",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/fd9ed7f3-3bbf-46d6-7b46-08de745ba03b",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "restaurants",
+                "fd9ed7f3-3bbf-46d6-7b46-08de745ba03b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "create-user",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"nikolay12\",\r\n  \"email\": \"nanov12@gmail.com\",\r\n  \"password\": \"123Qwe\",\r\n  \"confirmPassword\": \"123Qwe\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetById User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/5f8b8939-fba5-4b29-b9cb-f4433282e658",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "5f8b8939-fba5-4b29-b9cb-f4433282e658"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "access-token",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
