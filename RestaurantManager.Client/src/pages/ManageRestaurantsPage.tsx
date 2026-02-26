@@ -5,17 +5,9 @@ import type { Restaurant, RestaurantFormValues, SingleRestaurantApiResponse } fr
 import { apiFetch } from "../api/apiFetch";
 import RestaurantForm from "../components/restaurants/RestaurantForm";
 import ModalShell from "../components/modals/ModalShell";
-
-const initialRestaurants: Restaurant[] = [
-  { id: "r1", name: "Bella Italia", location: "Sofia", status: "Open", cuisine: "Italian", description: "", imgUrl: "", ownerId: null },
-  { id: "r2", name: "Sushi World", location: "Plovdiv", status: "Closed", cuisine: "Japanese", imgUrl: "", ownerId: null, description: "" },
-  { id: "r3", name: "Burger Palace", location: "Varna", status: "Open", cuisine: "American", imgUrl: "", ownerId: null, description: "" },
-  { id: "r4", name: "Taco Fiesta", location: "Burgas", status: "Open", cuisine: "Mexican", imgUrl: "", ownerId: null, description: "" },
-];
-
-export const classNames = (...v: Array<string | undefined | false>) => {
-  return v.filter(Boolean).join(" ");
-}
+import { classNames } from "../components/helper";
+import DeleteRestaurantModal from "../components/restaurants/DeleteRestaurantModal";
+import EditRestaurantModal from "../components/restaurants/EditRestaurantModal";
 
 const emptyForm: RestaurantFormValues = {
   name: "",
@@ -24,10 +16,11 @@ const emptyForm: RestaurantFormValues = {
   cuisine: "",
   description: "",
   imgUrl: "",
+  ownerId: null
 };
 
 const ManageRestaurantsPage = () => {
-  const [rows, setRows] = useState<Restaurant[]>(initialRestaurants);
+  const [rows, setRows] = useState<Restaurant[]>([]);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Restaurant | null>(null);
@@ -76,7 +69,6 @@ const ManageRestaurantsPage = () => {
   }
 
   const deleteRestaurant = async (id: string) => {
-    debugger
     await apiFetch(`api/restaurants/${id}`, {
       method: "DELETE"
     });
@@ -129,57 +121,18 @@ const ManageRestaurantsPage = () => {
             submitLabel="Create"
             onSubmit={createRestaurant}
             onCancel={() => setCreateOpen(false)}
-            classNames={classNames}
           />
         </ModalShell>
       )}
 
       {/* Edit modal */}
       {editTarget && (
-        <ModalShell title={`Edit: ${editTarget.name}`} onClose={() => setEditTarget(null)}>
-          <RestaurantForm
-            initial={{
-              name: editTarget.name,
-              location: editTarget.location,
-              cuisine: editTarget.cuisine,
-              status: editTarget.status,
-              description: editTarget.description,
-              imgUrl: editTarget.imgUrl,
-              ownerId: editTarget.ownerId
-            }}
-            submitLabel="Save"
-            onSubmit={(values) => updateRestaurant(editTarget.id, values)}
-            onCancel={() => setEditTarget(null)}
-            classNames={classNames}
-          />
-        </ModalShell>
+        <EditRestaurantModal editTarget={editTarget} setEditTarget={setEditTarget} updateRestaurant={updateRestaurant} />
       )}
 
       {/* Delete modal */}
       {deleteTarget && (
-        <ModalShell title="Delete restaurant?" onClose={() => setDeleteTarget(null)}>
-          <div className="space-y-4">
-            <p className="text-sm text-slate-700">
-              Are you sure you want to delete <span className="font-semibold">{deleteTarget.name}</span>?
-              This will remove it from the list. (Dummy data only for now)
-            </p>
-
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => deleteRestaurant(deleteTarget.id)}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </ModalShell>
+        <DeleteRestaurantModal deleteTarget={deleteTarget} setDeleteTarget={setDeleteTarget} deleteRestaurant={deleteRestaurant} />
       )}
     </div>
   );

@@ -5,7 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
-  ReactNode,
+  type ReactNode,
 } from "react";
 
 type User = {

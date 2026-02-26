@@ -1,18 +1,17 @@
 import { useState } from "react";
 import type { RestaurantFormValues, RestaurantStatus } from "../../types/restaurants";
+import { classNames } from "../helper";
 
 const RestaurantForm = ({
   initial,
   submitLabel,
   onSubmit,
   onCancel,
-  classNames
 }: {
   initial: RestaurantFormValues;
   submitLabel: string;
   onSubmit: (values: RestaurantFormValues) => Promise<void>;
   onCancel: () => void;
-  classNames: (...v: Array<string | undefined | false>) => string;
 }) => {
   const [form, setForm] = useState<RestaurantFormValues>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -53,13 +52,13 @@ const RestaurantForm = ({
 
       <div>
         <label className="text-xs font-medium text-slate-700">Description</label>
-        <input
+        <textarea
           className={classNames(
             "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-slate-400",
-            errors.name ? "border-rose-300" : "border-slate-200"
+            errors.description ? "border-rose-300" : "border-slate-200"
           )}
           value={form.description}
-          aria-multiline
+          rows={3}
           onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
           placeholder="e.g. Bella Italia"
         />

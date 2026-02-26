@@ -3,10 +3,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { apiFetch } from "../api/apiFetch";
 import type { RestaurantFormValues, RestaurantStatus, RestaurantWithMenu, SingleRestaurantApiResponse } from "../types/restaurants";
-import type { Menu } from "../types/menu-types";
+import type { Menu, MenuForm } from "../types/menu-types";
 import ModalShell from "../components/modals/ModalShell";
-import RestaurantForm from "../components/restaurants/RestaurantForm";
-import { classNames } from "./ManageRestaurantsPage";
+import DeleteRestaurantModal from "../components/restaurants/DeleteRestaurantModal";
+import EditRestaurantModal from "../components/restaurants/EditRestaurantModal";
+import MenuEditForm from "../components/menus/MenuEditForm";
 
 const cx = (...v: Array<string | false | undefined>) => v.filter(Boolean).join(" ");
 
@@ -31,6 +32,8 @@ const SingleRestaurantPage = ({ }) => {
     const [editTarget, setEditTarget] = useState<RestaurantWithMenu | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<RestaurantWithMenu | null>(null);
 
+    const [createMenuModalVisible, setCreateMenuModalVisible] = useState<boolean>(false);
+
     const didInit = useRef(false);
 
     useEffect(() => {
@@ -46,17 +49,7 @@ const SingleRestaurantPage = ({ }) => {
         });
 
         if (restaurantData) {
-            setRestaurant({
-                id: restaurantData.id,
-                name: restaurantData.name,
-                description: restaurantData.description,
-                status: restaurantData.status,
-                cuisine: restaurantData.cuisine,
-                location: restaurantData.location,
-                imgUrl: restaurantData.imgUrl,
-                ownerId: restaurantData.ownerId,
-                menus: []
-            });
+            setRestaurant(restaurantData);
         }
     }
 
@@ -81,25 +74,6 @@ const SingleRestaurantPage = ({ }) => {
         setSelectedMenuId(menuId);
     };
 
-    const addMenuDummy = () => {
-        if (!restaurant) return;
-        const newId = crypto.randomUUID();
-        const newMenu: Menu = {
-            id: newId,
-            name: "New Menu",
-            description: "Describe this menu...",
-            isActive: false,
-            imgUrl: "",
-            type: "Default"
-        };
-        setRestaurant({ ...restaurant, menus: [...restaurant.menus, newMenu] });
-        setSelectedMenuId(newId);
-    };
-
-    const refreshDummy = async () => {
-        await fetchRestaurant();
-    };
-
     const updateRestaurant = async (id: string, formData: RestaurantFormValues) => {
         await apiFetch("api/restaurants", {
             method: "PUT",
@@ -114,9 +88,26 @@ const SingleRestaurantPage = ({ }) => {
         await apiFetch(`api/restaurants/${id}`, {
             method: "DELETE"
         });
-        
+
         navigate("/manage-restaurants");
     }
+
+    const addMenu = async (formData: MenuForm) => {
+        const menu: Menu = await apiFetch("api/menus", {
+            method: "POST",
+            body: JSON.stringify(formData)
+        });
+        if (menu && restaurant) {
+            const newData: RestaurantWithMenu = { 
+                ...restaurant, 
+                menus: [...restaurant!.menus, menu] 
+            };
+
+            setRestaurant(newData);
+            setSelectedMenuId(menu.id);
+            setCreateMenuModalVisible(false);
+        }
+    };
 
     if (!restaurant) {
         return (
@@ -140,7 +131,7 @@ const SingleRestaurantPage = ({ }) => {
                     <h2 className="text-xl font-semibold text-slate-900">{restaurant.name}</h2>
 
                     <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
-                        <Link to="/restaurants" className="hover:text-slate-900">
+                        <Link to="/manage-restaurants" className="hover:text-slate-900">
                             Restaurants
                         </Link>
                         <span className="text-slate-400">/</span>
@@ -166,7 +157,7 @@ const SingleRestaurantPage = ({ }) => {
                     </button>
 
                     <button
-                        onClick={refreshDummy}
+                        onClick={fetchRestaurant}
                         className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                         title="Refresh dummy data"
                     >
@@ -229,7 +220,7 @@ const SingleRestaurantPage = ({ }) => {
                     </div>
 
                     <button
-                        onClick={addMenuDummy}
+                        onClick={() => setCreateMenuModalVisible(true)}
                         className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                     >
                         <Plus className="h-4 w-4" />
@@ -314,48 +305,27 @@ const SingleRestaurantPage = ({ }) => {
 
             {/* Edit modal */}
             {editTarget && (
-                <ModalShell title={`Edit: ${editTarget.name}`} onClose={() => setEditTarget(null)}>
-                    <RestaurantForm
-                        initial={{
-                            name: editTarget.name,
-                            location: editTarget.location,
-                            cuisine: editTarget.cuisine,
-                            status: editTarget.status,
-                            description: editTarget.description,
-                            imgUrl: editTarget.imgUrl,
-                            ownerId: editTarget.ownerId
-                        }}
-                        submitLabel="Save"
-                        onSubmit={(values) => updateRestaurant(editTarget.id, values)}
-                        onCancel={() => setEditTarget(null)}
-                        classNames={classNames}
-                    />
-                </ModalShell>
+                <EditRestaurantModal editTarget={editTarget} setEditTarget={setEditTarget} updateRestaurant={updateRestaurant} />
             )}
             {/* Delete modal */}
             {deleteTarget && (
-                <ModalShell title="Delete restaurant?" onClose={() => setDeleteTarget(null)}>
-                    <div className="space-y-4">
-                        <p className="text-sm text-slate-700">
-                            Are you sure you want to delete <span className="font-semibold">{deleteTarget.name}</span>?
-                            This will remove it from the list. (Dummy data only for now)
-                        </p>
-
-                        <div className="flex justify-end gap-2">
-                            <button
-                                onClick={() => setDeleteTarget(null)}
-                                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => deleteRestaurant(deleteTarget.id)}
-                                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
+                <DeleteRestaurantModal deleteTarget={deleteTarget} setDeleteTarget={setDeleteTarget} deleteRestaurant={deleteRestaurant} />
+            )}
+            {createMenuModalVisible && (
+                <ModalShell title="Edit Menu" onClose={() => setCreateMenuModalVisible(false)}>
+                    <MenuEditForm
+                        initial={{
+                            id: null,
+                            name: "",
+                            description: "",
+                            imgUrl: "",
+                            isActive: false,
+                            type: "Default",
+                            restaurantId: restaurantId as string
+                        }}
+                        onCancel={() => setCreateMenuModalVisible(false)}
+                        onSubmit={addMenu}
+                    />
                 </ModalShell>
             )}
         </div>

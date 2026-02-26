@@ -14,7 +14,11 @@ namespace RestaurantManager.Application.Handlers.Menus.GetById
     {
         public async Task<GetMenuByIdResponse> Handle(GetMenuByIdQuery request, CancellationToken cancellationToken)
         {
-            var menu = await restaurantManagerDbContext.Menus.AsNoTracking().FirstOrDefaultAsync(r => r.Id == request.Id)
+            var menu = await restaurantManagerDbContext
+                .Menus
+                .Include(m => m.MenuItems)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id == request.Id)
                 ?? throw new ResourceNotFoundException(nameof(Menu), $"Menu with id {request.Id} was not found.");
 
             var response = mapper.Map<GetMenuByIdResponse>(menu);

@@ -43,7 +43,6 @@ namespace RestaurantManager.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<UserInfoResponse>> UserInfo()
         {
-            var user = User;
             var result = await mediator.Send(new UserInfoResponseQuery());
             return Ok(result);
         }

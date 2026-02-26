@@ -8,7 +8,7 @@ const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   headers.set("Content-Type", "application/json");
   
   const res = await fetch(fullEndpoint, {
-    credentials: "include", // include http only cookie
+    credentials: "include", // includes http only cookie
     headers,
     ...options,
   });
