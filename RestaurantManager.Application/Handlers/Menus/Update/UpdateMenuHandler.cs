@@ -11,7 +11,6 @@ using RestaurantManager.Domain.Entities;
 namespace RestaurantManager.Application.Handlers.Menus.Update
 {
     internal class UpdateMenuHandler(
-
         IRestaurantManagerDbContext dbContext,
         IMapper mapper,
         ICurrentUserService currentUserService,

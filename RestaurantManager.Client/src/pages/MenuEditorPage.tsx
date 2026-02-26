@@ -14,7 +14,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import type { MenuItem } from "../types/menu-item-types";
-import type {  MenuWithItems } from "../types/menu-types";
+import type { MenuWithItems } from "../types/menu-types";
 import ModalShell from "../components/modals/ModalShell";
 import FragmentCategoryGroup from "../components/menu-items/FragmentCategoryGroup";
 import MenuItemForm from "../components/menu-items/MenuItemForm";
@@ -23,17 +23,19 @@ import MenuEditForm from "../components/menus/MenuEditForm";
 import Pill from "../components/shared/Pill";
 import { normalizeCategory } from "../components/helper";
 import { apiFetch } from "../api/apiFetch";
+import { type Category, type ListAllCategoriesApiResponse } from "../types/categories-types";
 
 // ---------- forms ----------
 export type MenuEditValues = Pick<MenuWithItems, "name" | "description" | "imgUrl" | "isActive" | "type">;
-export type MenuItemFormValues = Pick<MenuItem, "name" | "price" | "imgUrl" | "isActive" | "category">;
+export type MenuItemFormValues = Pick<MenuItem, "name" | "price" | "imgUrl" | "isActive" | "categoryId" | "categoryText">;
 
 const emptyItem: MenuItemFormValues = {
   name: "",
   price: 0,
   imgUrl: "",
   isActive: true,
-  category: "",
+  categoryId: "",
+  categoryText: ""
 };
 
 // ---------- page ----------
@@ -41,6 +43,7 @@ const MenuEditorPage = () => {
   const { restaurantId = "r1", menuId = "m1" } = useParams();
 
   const [menu, setMenu] = useState<MenuWithItems>(() => seedMenu(restaurantId, menuId));
+  const [categories, setCategories] = useState<Category[]>([])
 
   const [menuEditOpen, setMenuEditOpen] = useState(false);
 
@@ -51,13 +54,11 @@ const MenuEditorPage = () => {
   // ✅ Dynamic grouping by DISTINCT categories from all items
   const grouped = useMemo(() => {
     const map = new Map<string, MenuItem[]>();
-    debugger
     for (const it of menu.items) {
-      const cat = normalizeCategory(it.category);
+      const cat = normalizeCategory(it.categoryText);
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(it);
     }
-
     // Sort categories alphabetically
     return Array.from(map.entries())
       .sort(([a], [b]) => a.localeCompare(b))
@@ -68,13 +69,14 @@ const MenuEditorPage = () => {
   }, [menu.items]);
 
   const didInit = useRef(false);
-  
-      useEffect(() => {
-          if (didInit.current) return;
-          didInit.current = true;
-  
-          void fetchMenuData();
-      }, []);
+
+  useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
+    void fetchMenuData();
+    void fetchCategoriesData();
+  }, []);
 
   const fetchMenuData = async () => {
     const menuData: MenuWithItems = await apiFetch(`api/menus/${menuId}`, {
@@ -86,26 +88,44 @@ const MenuEditorPage = () => {
     }
   };
 
+  const fetchCategoriesData = async () => {
+    const categoriesData: ListAllCategoriesApiResponse = await apiFetch("api/categories", {
+      method: "GET"
+    })
+
+    if (categoriesData) {
+      setCategories(categoriesData.categories);
+    }
+  };
+
   const editMenu = (v: MenuEditValues) => {
     setMenu((p) => ({ ...p, ...v }));
     setMenuEditOpen(false);
   };
 
-  const addItem = (v: MenuItemFormValues) => {
-    const newItem: MenuItem = {
-      id: crypto.randomUUID(),
-      ...v,
-      category: normalizeCategory(v.category),
-    };
+  const addItem = async (formData: MenuItemFormValues) => {
+    const newItem = await apiFetch('api/menu-items', {
+      method: "POST",
+      body: JSON.stringify({
+        categoryId: formData.categoryId,
+        menuId: menu.id,
+        name: formData.name,
+        price: formData.price,
+        imgUrl: formData.imgUrl,
+        isActive: formData.isActive
+      })
+    });
 
-    setMenu((p) => ({ ...p, items: [newItem, ...p.items] }));
-    setItemCreateOpen(false);
+    if (newItem) {
+      setMenu((p) => ({ ...p, items: [newItem, ...p.items] }));
+      setItemCreateOpen(false);
+    }
   };
 
   const updateItem = (id: string, v: MenuItemFormValues) => {
     setMenu((p) => ({
       ...p,
-      items: p.items.map((it) => (it.id === id ? { ...it, ...v, category: normalizeCategory(v.category) } : it)),
+      items: p.items.map((it) => (it.id === id ? { ...it, ...v, category: normalizeCategory(v.categoryId) } : it)),
     }));
     setItemEditTarget(null);
   };
@@ -115,7 +135,7 @@ const MenuEditorPage = () => {
     setItemDeleteTarget(null);
   };
 
-  const copyId = async (value: string|null) => {
+  const copyId = async (value: string | null) => {
     try {
       await navigator.clipboard.writeText(value ?? "");
     } catch {
@@ -299,7 +319,11 @@ const MenuEditorPage = () => {
 
       {itemCreateOpen && (
         <ModalShell title="Add Menu Item" onClose={() => setItemCreateOpen(false)}>
-          <MenuItemForm initial={emptyItem} submitLabel="Create" onCancel={() => setItemCreateOpen(false)} onSubmit={addItem} />
+          <MenuItemForm
+            initial={emptyItem}
+            categories={categories}
+            submitLabel="Create"
+            onCancel={() => setItemCreateOpen(false)} onSubmit={addItem} />
         </ModalShell>
       )}
 
@@ -311,8 +335,10 @@ const MenuEditorPage = () => {
               price: itemEditTarget.price,
               imgUrl: itemEditTarget.imgUrl ?? "",
               isActive: itemEditTarget.isActive,
-              category: itemEditTarget.category,
+              categoryId: itemEditTarget.categoryId,
+              categoryText: itemEditTarget.categoryText
             }}
+            categories={categories}
             submitLabel="Save"
             onCancel={() => setItemEditTarget(null)}
             onSubmit={(v) => updateItem(itemEditTarget.id, v)}
