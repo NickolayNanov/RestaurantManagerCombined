@@ -4,5 +4,6 @@ export type MenuItem = {
   price: number;
   imgUrl?: string;
   isActive: boolean;
-  category: string;
+  categoryId: string;
+  categoryText: string;
 };

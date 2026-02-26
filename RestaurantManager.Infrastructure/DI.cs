@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using RestaurantManager.Domain.Entities;
 
 namespace RestaurantManager.Infrastructure
 {
@@ -101,9 +102,24 @@ namespace RestaurantManager.Infrastructure
             if (seedDatabase)
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                if (!roleManager.Roles.Any())
+                {
+                    roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
+                    roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
+                }
 
-                roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
-                roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
+                if (!dbContext.Categories.Any())
+                {
+                    dbContext.Categories.AddRange(new List<Category>()
+                    {
+                        new Category() { IsActive = true, Name = "Salads" },
+                        new Category() { IsActive = true, Name = "Main dishes" },
+                        new Category() { IsActive = true, Name = "Deserts" },
+                        new Category() { IsActive = true, Name = "Sides" },
+                        new Category() { IsActive = true, Name = "Prishtqvki" },
+                    });
+                    dbContext.SaveChanges();
+                }
             }
 
             return app;

@@ -14,15 +14,15 @@ namespace RestaurantManager.Application.Handlers.Menus.Delete
     {
         public async Task<DeleteMenuResponse> Handle(DeleteMenuCommand request, CancellationToken cancellationToken)
         {
-            var menu = await restaurantManagerDbContext.Menus.AsNoTracking().FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+            var menuItem = await restaurantManagerDbContext.Menus.AsNoTracking().FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
-            if (menu is null)
+            if (menuItem is null)
             {
-                logger.LogWarning("Menu with id {Id} not found", request.Id);
-                throw new ResourceNotFoundException(nameof(Menu), $"Menu with id {request.Id} was not found when trying to delete.");
+                logger.LogWarning("Menu Item with id {Id} not found", request.Id);
+                throw new ResourceNotFoundException(nameof(MenuItem), $"Menu Item with id {request.Id} was not found when trying to delete.");
             }
 
-            restaurantManagerDbContext.Menus.Remove(menu);
+            restaurantManagerDbContext.Menus.Remove(menuItem);
 
             return new DeleteMenuResponse(true);
         }

@@ -12,8 +12,8 @@ using RestaurantManager.Infrastructure;
 namespace RestaurantManager.Infrastructure.Migrations
 {
     [DbContext(typeof(RestaurantManagerDbContext))]
-    [Migration("20260224235102_initial-create")]
-    partial class initialcreate
+    [Migration("20260226185613_initial_create")]
+    partial class initial_create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -306,6 +306,9 @@ namespace RestaurantManager.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -337,36 +340,11 @@ namespace RestaurantManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("MenuId");
 
                     b.ToTable("MenuItems");
-                });
-
-            modelBuilder.Entity("RestaurantManager.Domain.Entities.MenuItemCategory", b =>
-                {
-                    b.Property<Guid>("MenuItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MenuItemId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("MenuItemCategories");
                 });
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Restaurant", b =>
@@ -381,12 +359,22 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Cuisine")
+                        .IsRequired()
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ImgUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -395,6 +383,9 @@ namespace RestaurantManager.Infrastructure.Migrations
 
                     b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -473,32 +464,21 @@ namespace RestaurantManager.Infrastructure.Migrations
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.MenuItem", b =>
                 {
+                    b.HasOne("RestaurantManager.Domain.Entities.Category", "Category")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("RestaurantManager.Domain.Entities.Menu", "Menu")
                         .WithMany("MenuItems")
                         .HasForeignKey("MenuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Menu");
-                });
-
-            modelBuilder.Entity("RestaurantManager.Domain.Entities.MenuItemCategory", b =>
-                {
-                    b.HasOne("RestaurantManager.Domain.Entities.Category", "Category")
-                        .WithMany("MenuItemCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RestaurantManager.Domain.Entities.MenuItem", "MenuItem")
-                        .WithMany("MenuItemCategories")
-                        .HasForeignKey("MenuItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
 
-                    b.Navigation("MenuItem");
+                    b.Navigation("Menu");
                 });
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Restaurant", b =>
@@ -518,17 +498,12 @@ namespace RestaurantManager.Infrastructure.Migrations
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Category", b =>
                 {
-                    b.Navigation("MenuItemCategories");
+                    b.Navigation("MenuItems");
                 });
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Menu", b =>
                 {
                     b.Navigation("MenuItems");
-                });
-
-            modelBuilder.Entity("RestaurantManager.Domain.Entities.MenuItem", b =>
-                {
-                    b.Navigation("MenuItemCategories");
                 });
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Restaurant", b =>

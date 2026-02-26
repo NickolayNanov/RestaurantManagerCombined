@@ -6,6 +6,6 @@
 
         public bool IsActive { get; set; }
 
-        public virtual IEnumerable<MenuItemCategory> MenuItemCategories { get; set; } = new HashSet<MenuItemCategory>();
+        public virtual IEnumerable<MenuItem> MenuItems { get; set; } = new HashSet<MenuItem>();
     }
 }
