@@ -8,7 +8,8 @@ export type SingleRestaurantApiResponse = {
   cuisine: string; 
   location: string; 
   imgUrl: string; 
-  ownerId: string|null; 
+  ownerId: string|null;
+  menus: Menu[];
   createdAt: Date;
   createdBy: string;
   updatedAt: Date;

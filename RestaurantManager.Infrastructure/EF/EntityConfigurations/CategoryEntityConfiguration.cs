@@ -17,10 +17,10 @@ namespace RestaurantManager.Infrastructure.EF.EntityConfigurations
             builder.Property(c => c.IsActive)
                 .IsRequired();
 
-            builder.HasMany(c => c.MenuItemCategories)
+            builder.HasMany(c => c.MenuItems)
                 .WithOne(mic => mic.Category)
                 .HasForeignKey(mic => mic.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

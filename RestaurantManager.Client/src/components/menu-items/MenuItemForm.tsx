@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { type MenuItemFormValues } from "../../pages/MenuEditorPage";
 import { normalizeCategory, cx } from "../helper";
+import type { Category } from "../../types/categories-types";
 
 const MenuItemForm = ({
   initial,
+  categories,
   submitLabel,
   onCancel,
   onSubmit,
 }: {
   initial: MenuItemFormValues;
+  categories: Category[];
   submitLabel: string;
   onCancel: () => void;
   onSubmit: (v: MenuItemFormValues) => void;
@@ -20,7 +23,7 @@ const MenuItemForm = ({
     const e: Record<string, string> = {};
     if (!x.name.trim()) e.name = "Name is required";
     if (!Number.isFinite(x.price) || x.price <= 0) e.price = "Price must be > 0";
-    if (!x.category.trim()) e.category = "Category is required";
+    if (!x.categoryId.trim()) e.category = "Category is required";
     return e;
   };
 
@@ -35,7 +38,8 @@ const MenuItemForm = ({
       price: Number(v.price),
       imgUrl: v.imgUrl?.trim() || "",
       isActive: v.isActive,
-      category: normalizeCategory(v.category),
+      categoryId: v.categoryId,
+      categoryName: normalizeCategory(v.categoryName)
     });
   };
 
@@ -73,15 +77,15 @@ const MenuItemForm = ({
 
         <div>
           <label className="text-xs font-medium text-slate-700">Category</label>
-          <input
-            className={cx(
-              "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-slate-400",
-              err.category ? "border-rose-300" : "border-slate-200"
-            )}
-            value={v.category}
-            onChange={(e) => setV((p) => ({ ...p, category: e.target.value }))}
-            placeholder="e.g. Drinks"
-          />
+          <select
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+            value={v.categoryId}
+            onChange={(e) => setV((p) => ({ ...p, categoryId: e.target.value, categoryName: categories.find(c => c.id === e.target.value)!.name }))}
+          >
+            {categories?.map(c => {
+              return <option key={c.id} value={c.id}>{c.name}</option>
+            })}
+          </select>
           {err.category && <div className="mt-1 text-xs text-rose-600">{err.category}</div>}
         </div>
       </div>
@@ -101,7 +105,7 @@ const MenuItemForm = ({
         <select
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
           value={v.isActive ? "active" : "inactive"}
-          onChange={(e) => setV((p) => ({ ...p, isActive: e.target.value === "active" }))}
+          onChange={(e) => setV((p) => ({ ...p, isActive: e.target.value == "active" }))}
         >
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>

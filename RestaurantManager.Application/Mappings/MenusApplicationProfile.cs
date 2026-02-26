@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RestaurantManager.Application.Handlers.MenuItems.GetById;
 using RestaurantManager.Application.Handlers.Menus.Create;
 using RestaurantManager.Application.Handlers.Menus.GetById;
 using RestaurantManager.Application.Handlers.Menus.Update;
@@ -13,7 +14,7 @@ namespace RestaurantManager.Application.Mappings
             // get
             this.CreateMap<Menu, GetMenuByIdResponse>()
                 .ForMember(x => x.Items, y => y.MapFrom(z => z.MenuItems));
-            this.CreateMap<MenuItem, MenuItemRecord>();
+            this.CreateMap<MenuItem, GetMenuItemByIdResponse>();
 
             // create
             this.CreateMap<CreateMenuCommand, Menu>();
