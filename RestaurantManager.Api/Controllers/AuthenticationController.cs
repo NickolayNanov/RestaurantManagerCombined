@@ -26,7 +26,7 @@ namespace RestaurantManager.Api.Controllers
             {
                 HttpOnly = true,
                 Secure = true,               // must be true in prod (and for SameSite=None)
-                SameSite = SameSiteMode.Lax, // use Lax if SPA+API are same-site; see notes below
+                SameSite = SameSiteMode.None, // use Lax if SPA+API are same-site; see notes below
                 Expires = DateTimeOffset.UtcNow.AddHours(2),
                 Path = "/"
             });

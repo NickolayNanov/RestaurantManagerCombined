@@ -1,25 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ManageRestaurantsHeader from "../components/restaurants/ManageRestaurantsHeader";
 import ManageRestaurantsTable from "../components/restaurants/ManageRestaurantsTable";
-import {
-  X,
-} from "lucide-react";
-import type { Restaurant } from "../types/restaurants";
-
-type RestaurantStatus = "Open" | "Closed";
+import type { Restaurant, RestaurantFormValues, SingleRestaurantApiResponse } from "../types/restaurants";
+import { apiFetch } from "../api/apiFetch";
+import RestaurantForm from "../components/restaurants/RestaurantForm";
+import ModalShell from "../components/modals/ModalShell";
 
 const initialRestaurants: Restaurant[] = [
-  { id: "r1", name: "Bella Italia", location: "Sofia", status: "Open", cuisine: "Italian", description: "", imgUrl: null, ownerId: null },
-  { id: "r2", name: "Sushi World", location: "Plovdiv", status: "Closed", cuisine: "Japanese", imgUrl: null, ownerId: null, description: "" },
-  { id: "r3", name: "Burger Palace", location: "Varna", status: "Open", cuisine: "American", imgUrl: null, ownerId: null, description: "" },
-  { id: "r4", name: "Taco Fiesta", location: "Burgas", status: "Open", cuisine: "Mexican", imgUrl: null, ownerId: null, description: "" },
+  { id: "r1", name: "Bella Italia", location: "Sofia", status: "Open", cuisine: "Italian", description: "", imgUrl: "", ownerId: null },
+  { id: "r2", name: "Sushi World", location: "Plovdiv", status: "Closed", cuisine: "Japanese", imgUrl: "", ownerId: null, description: "" },
+  { id: "r3", name: "Burger Palace", location: "Varna", status: "Open", cuisine: "American", imgUrl: "", ownerId: null, description: "" },
+  { id: "r4", name: "Taco Fiesta", location: "Burgas", status: "Open", cuisine: "Mexican", imgUrl: "", ownerId: null, description: "" },
 ];
 
-function classNames(...v: Array<string | undefined | false>) {
+export const classNames = (...v: Array<string | undefined | false>) => {
   return v.filter(Boolean).join(" ");
 }
-
-type RestaurantFormValues = Omit<Restaurant, "id">;
 
 const emptyForm: RestaurantFormValues = {
   name: "",
@@ -27,213 +23,103 @@ const emptyForm: RestaurantFormValues = {
   status: "Open",
   cuisine: "",
   description: "",
-  imgUrl: null,
-  ownerId: null
+  imgUrl: "",
 };
 
-function ModalShell({
-  title,
-  children,
-  onClose,
-}: {
-  title: string;
-  children: React.ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 w-[92vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-          <button
-            className="rounded-lg p-2 hover:bg-slate-100"
-            aria-label="Close"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4 text-slate-700" />
-          </button>
-        </div>
-        <div className="px-5 py-4">{children}</div>
-      </div>
-    </div>
-  );
-}
-
-const RestaurantForm = ({
-  initial,
-  submitLabel,
-  onSubmit,
-  onCancel,
-}: {
-  initial: RestaurantFormValues;
-  submitLabel: string;
-  onSubmit: (values: RestaurantFormValues) => void;
-  onCancel: () => void;
-}) => {
-  const [values, setValues] = useState<RestaurantFormValues>(initial);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  function validate(v: RestaurantFormValues) {
-    const e: Record<string, string> = {};
-    if (!v.name.trim()) e.name = "Name is required";
-    if (!v.location.trim()) e.location = "Location is required";
-    if (!v.cuisine.trim()) e.cuisine = "Cuisine is required";
-    return e;
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const eMap = validate(values);
-    setErrors(eMap);
-    if (Object.keys(eMap).length > 0) return;
-    onSubmit({
-      name: values.name.trim(),
-      location: values.location.trim(),
-      cuisine: values.cuisine.trim(),
-      status: values.status,
-      description: "",
-      imgUrl: null,
-      ownerId: null
-    });
-  }
-
-  return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      <div>
-        <label className="text-xs font-medium text-slate-700">Name</label>
-        <input
-          className={classNames(
-            "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-slate-400",
-            errors.name ? "border-rose-300" : "border-slate-200"
-          )}
-          value={values.name}
-          onChange={(e) => setValues((p) => ({ ...p, name: e.target.value }))}
-          placeholder="e.g. Bella Italia"
-        />
-        {errors.name && <div className="mt-1 text-xs text-rose-600">{errors.name}</div>}
-      </div>
-
-      <div>
-        <label className="text-xs font-medium text-slate-700">Description</label>
-        <input
-          className={classNames(
-            "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-slate-400",
-            errors.name ? "border-rose-300" : "border-slate-200"
-          )}
-          value={values.description}
-          aria-multiline
-          onChange={(e) => setValues((p) => ({ ...p, description: e.target.value }))}
-          placeholder="e.g. Bella Italia"
-        />
-        {errors.name && <div className="mt-1 text-xs text-rose-600">{errors.name}</div>}
-      </div>
-
-      <div>
-        <label className="text-xs font-medium text-slate-700">Location</label>
-        <input
-          className={classNames(
-            "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-slate-400",
-            errors.location ? "border-rose-300" : "border-slate-200"
-          )}
-          value={values.location}
-          onChange={(e) => setValues((p) => ({ ...p, location: e.target.value }))}
-          placeholder="e.g. Sofia"
-        />
-        {errors.location && <div className="mt-1 text-xs text-rose-600">{errors.location}</div>}
-      </div>
-
-      <div>
-        <label className="text-xs font-medium text-slate-700">Cuisine</label>
-        <input
-          className={classNames(
-            "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-slate-400",
-            errors.cuisine ? "border-rose-300" : "border-slate-200"
-          )}
-          value={values.cuisine}
-          onChange={(e) => setValues((p) => ({ ...p, cuisine: e.target.value }))}
-          placeholder="e.g. Italian"
-        />
-        {errors.cuisine && <div className="mt-1 text-xs text-rose-600">{errors.cuisine}</div>}
-      </div>
-
-      <div>
-        <label className="text-xs font-medium text-slate-700">Status</label>
-        <select
-          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
-          value={values.status}
-          onChange={(e) => setValues((p) => ({ ...p, status: e.target.value as RestaurantStatus }))}
-        >
-          <option value="Open">Open</option>
-          <option value="Closed">Closed</option>
-        </select>
-      </div>
-
-      <div className="flex justify-end gap-2 pt-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          {submitLabel}
-        </button>
-      </div>
-    </form>
-  );
-}
-
-export default function ManageRestaurantsPage() {
+const ManageRestaurantsPage = () => {
   const [rows, setRows] = useState<Restaurant[]>(initialRestaurants);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Restaurant | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Restaurant | null>(null);
 
-  const subtitle = useMemo(
-    () => `Manage restaurants in your portfolio. Create, edit, open menus, or remove old entries.`,
-    []
-  );
+  const didInit = useRef(false);
 
-  function createRestaurant(values: RestaurantFormValues) {
-    const newRestaurant: Restaurant = {
-      id: crypto.randomUUID(),
-      ...values,
-    };
-    setRows((prev) => [newRestaurant, ...prev]);
-    setCreateOpen(false);
+  useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
+    void fetchRestaurants();
+  }, []);
+
+  const createRestaurant = async (formData: RestaurantFormValues) => {
+    const response = await apiFetch("api/restaurants", {
+      method: "POST",
+      body: JSON.stringify(formData)
+    });
+
+    if (response) {
+      const newRestaurant: Restaurant = {
+        id: response.id,
+        name: response.name,
+        description: response.description,
+        status: response.status,
+        cuisine: response.cuisine,
+        location: response.location,
+        imgUrl: response.imgUrl,
+        ownerId: response.ownerId
+      }
+
+      setRows((prev) => [newRestaurant, ...prev]);
+      setCreateOpen(false);
+    }
   }
 
-  function updateRestaurant(id: string, values: RestaurantFormValues) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...values } : r)));
+  const updateRestaurant = async (id: string, formData: RestaurantFormValues) => {
+    await apiFetch("api/restaurants", {
+      method: "PUT",
+      body: JSON.stringify({ id, ...formData })
+    });
+
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...formData } : r)));
     setEditTarget(null);
   }
 
-  function deleteRestaurant(id: string) {
+  const deleteRestaurant = async (id: string) => {
+    debugger
+    await apiFetch(`api/restaurants/${id}`, {
+      method: "DELETE"
+    });
     setRows((prev) => prev.filter((r) => r.id !== id));
     setDeleteTarget(null);
+  }
+
+  const fetchRestaurants = async () => {
+    const data = await apiFetch("api/restaurants", {
+      method: "GET"
+    });
+    
+    const restaurants = data.restaurants.map((r: SingleRestaurantApiResponse) => {
+      return {
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        status: r.status,
+        cuisine: r.cuisine,
+        location: r.location,
+        imgUrl: r.imgUrl,
+        ownerId: r.ownerId
+      }
+    });
+
+    if (restaurants) {
+      setRows(restaurants);
+    }
   }
 
   return (
     <div className="space-y-4">
       {/* Header area (matches your app's style) */}
 
-      <ManageRestaurantsHeader
-        subtitle={subtitle}
-        setCreateOpen={setCreateOpen} />
+      <ManageRestaurantsHeader setCreateOpen={setCreateOpen} />
 
       {/* Table card */}
       <ManageRestaurantsTable
         data={rows}
         setDeleteTarget={setDeleteTarget}
         setEditTarget={setEditTarget}
-        setRows={setRows}
-        classNames={classNames} />
+        classNames={classNames} 
+        fetchRestaurants={fetchRestaurants} />
 
       {/* Create modal */}
       {createOpen && (
@@ -243,6 +129,7 @@ export default function ManageRestaurantsPage() {
             submitLabel="Create"
             onSubmit={createRestaurant}
             onCancel={() => setCreateOpen(false)}
+            classNames={classNames}
           />
         </ModalShell>
       )}
@@ -263,6 +150,7 @@ export default function ManageRestaurantsPage() {
             submitLabel="Save"
             onSubmit={(values) => updateRestaurant(editTarget.id, values)}
             onCancel={() => setEditTarget(null)}
+            classNames={classNames}
           />
         </ModalShell>
       )}
@@ -296,3 +184,5 @@ export default function ManageRestaurantsPage() {
     </div>
   );
 }
+
+export default ManageRestaurantsPage

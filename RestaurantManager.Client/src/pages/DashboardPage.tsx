@@ -6,7 +6,7 @@ import TopDishes from "../components/dashboard/TopDishes";
 import { dashboardKpis } from "../data/dashboard";
 import { Store, Star, DollarSign } from "lucide-react";
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   return (
     <div className="flex h-full flex-col space-y-4">
       {/* KPI row */}
@@ -44,3 +44,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+export default DashboardPage;

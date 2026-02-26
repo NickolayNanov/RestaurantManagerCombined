@@ -5,8 +5,10 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import ManageRestaurantsPage from "./pages/ManageRestaurantsPage";
+import SingleRestaurantPage from "./pages/SingleRestaurantPage";
+import MenuEditorPage from "./pages/MenuEditorPage";
 
-export default function App() {
+const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -18,6 +20,8 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/manage-restaurants" element={<ManageRestaurantsPage />} />
+          <Route path="/manage-restaurants/:restaurantId" element={<SingleRestaurantPage />} />
+          <Route path="/manage-restaurants/:restaurantId/menus/:menuId" element={<MenuEditorPage />} />
         </Route>
       </Route>
 
@@ -25,3 +29,5 @@ export default function App() {
     </Routes>
   );
 }
+
+export default App;

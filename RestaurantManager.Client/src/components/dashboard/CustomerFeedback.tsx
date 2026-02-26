@@ -1,6 +1,6 @@
 import { dashboardKpis, feedback } from "../../data/dashboard";
 
-function Row({ label, value }: { label: string; value: number }) {
+const Row = ({ label, value } : { label: string; value: number }) => {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs text-slate-600">
@@ -14,7 +14,7 @@ function Row({ label, value }: { label: string; value: number }) {
   );
 }
 
-export default function CustomerFeedback() {
+const CustomerFeedback = () => {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <h3 className="text-sm font-semibold text-slate-900">Customer Feedback</h3>
@@ -34,3 +34,5 @@ export default function CustomerFeedback() {
     </section>
   );
 }
+
+export default CustomerFeedback;

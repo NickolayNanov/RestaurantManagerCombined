@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Azure;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
@@ -8,8 +6,6 @@ using RestaurantManager.Application.Handlers.Restaurants.Delete;
 using RestaurantManager.Application.Handlers.Restaurants.GetById;
 using RestaurantManager.Application.Handlers.Restaurants.GetMany;
 using RestaurantManager.Application.Handlers.Restaurants.Update;
-using RestaurantManager.Application.Handlers.Users.Create;
-using RestaurantManager.Domain.Entities;
 
 namespace RestaurantManager.Api.Controllers
 {
@@ -17,17 +13,8 @@ namespace RestaurantManager.Api.Controllers
     [Authorize]
     [Route("api/restaurants")]
     [Produces("application/json")]
-    public class RestaurantsController : ControllerBase
+    public class RestaurantsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator mediator;
-        private readonly IMapper _mapper;
-
-        public RestaurantsController(IMediator mediator, IMapper mapper)
-        {
-            this.mediator = mediator;
-            this._mapper = mapper;
-        }
-
         /// <summary>
         /// List restaurants (supports basic pagination via skip/take).
         /// </summary>
@@ -60,9 +47,9 @@ namespace RestaurantManager.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CreateRestaurantResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromBody] CreateRestaurantCommand dto)
+        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromBody] CreateRestaurantCommand command)
         {
-            var result = await mediator.Send(dto);
+            var result = await mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -70,7 +57,6 @@ namespace RestaurantManager.Api.Controllers
         /// Full update (replace) of a restaurant.
         /// </summary>
         [HttpPut]
-        [Authorize] // optionally: [Authorize(Roles = "Owner,Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -84,7 +70,6 @@ namespace RestaurantManager.Api.Controllers
         /// Delete a restaurant.
         /// </summary>
         [HttpDelete("{id:guid}")]
-        [Authorize] // optionally: [Authorize(Roles = "Owner,Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)

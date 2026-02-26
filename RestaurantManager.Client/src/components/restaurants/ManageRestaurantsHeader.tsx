@@ -1,18 +1,14 @@
 import { Plus } from "lucide-react";
 
 type ManageRestaurantsHeaderProps = {
-    subtitle: string;
     setCreateOpen: (v: boolean) => void;
 };
 
-export default ({
-    subtitle,
-    setCreateOpen
-}: ManageRestaurantsHeaderProps) => {
+const ManageRestaurantsHeader = ({ setCreateOpen } : ManageRestaurantsHeaderProps) => {
     return (
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-                <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
+                <p className="mt-1 text-sm text-slate-600">Manage restaurants in your portfolio. Create, edit, open menus, or remove old entries.</p>
             </div>
 
             <button
@@ -25,3 +21,5 @@ export default ({
         </div>
     )
 };
+
+export default ManageRestaurantsHeader;

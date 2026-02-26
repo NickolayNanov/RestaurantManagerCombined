@@ -7,10 +7,10 @@ const linkBase =
 const linkInactive = "text-slate-600 hover:bg-slate-100 hover:text-slate-900";
 const linkActive = "bg-slate-100 text-slate-900";
 
-export default function Sidebar() {
+const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-debugger
+
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
@@ -23,7 +23,7 @@ debugger
           <div className="h-12 w-12 rounded-full bg-slate-200" />
           <div>
             <div className="text-sm font-semibold text-slate-900">
-              {user?.name ?? "Guest"}
+              {user?.username ?? "Guest"}
             </div>
             <div className="text-xs text-slate-500">
               {user?.roles?.length ? user.roles.join(", ") : "Not signed in"}
@@ -64,3 +64,5 @@ debugger
     </aside>
   );
 }
+
+export default Sidebar;

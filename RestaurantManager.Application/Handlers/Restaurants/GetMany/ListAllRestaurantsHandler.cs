@@ -12,7 +12,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetMany
     {
         public async Task<GetManyRestaurantsResponse> Handle(ListAllRestaurantsQuery request, CancellationToken cancellationToken)
         {
-            var items = await mapper.ProjectTo<GetRestaurantByIdResponse>(restaurantManagerDbContext.Restaurants).ToListAsync() ?? [];
+            var items = await mapper.ProjectTo<GetRestaurantByIdResponse>(restaurantManagerDbContext.Restaurants.AsNoTracking()).ToListAsync() ?? [];
             return new GetManyRestaurantsResponse(items);
         }
     }

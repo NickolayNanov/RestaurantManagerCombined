@@ -1,4 +1,4 @@
-export default function ProfilePage() {
+const ProfilePage = () => {
   return (
     <div className="space-y-2">
       <h2 className="text-xl font-semibold text-slate-900">Profile</h2>
@@ -6,3 +6,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+export default ProfilePage;

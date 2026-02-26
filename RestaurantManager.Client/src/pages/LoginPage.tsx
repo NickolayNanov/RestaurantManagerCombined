@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
-export default function LoginPage() {
+const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -74,3 +74,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default LoginPage;

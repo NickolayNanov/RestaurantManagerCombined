@@ -7,8 +7,8 @@ export type AuthUser = {
 };
 
 export type AuthState = {
-  token: string | null;
-  user: AuthUser | null;
+  user: UserInfo | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
 };
 
@@ -23,9 +23,9 @@ export type LoginResponse = {
   user: AuthUser;
 };
 
-export type AuthEndpointResponse = {
-    accessToken: string;
-    accessTokenExpiration: Date;
-    refreshToken: string | null;
-    refreshTokenExpiration: Date | null;
+export type UserInfo = {
+    id: string;
+    username: string;
+    email: string;
+    roles: string[];
 }

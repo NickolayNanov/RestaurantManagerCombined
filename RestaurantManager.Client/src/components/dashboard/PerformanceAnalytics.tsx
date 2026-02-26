@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { analytics } from "../../data/dashboard";
 
-export default function PerformanceAnalytics() {
+const PerformanceAnalytics = () => {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
@@ -45,4 +45,6 @@ export default function PerformanceAnalytics() {
       </div>
     </section>
   );
-}
+};
+
+export default PerformanceAnalytics;

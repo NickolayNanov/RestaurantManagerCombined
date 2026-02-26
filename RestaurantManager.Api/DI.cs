@@ -1,9 +1,11 @@
-﻿using Microsoft.Net.Http.Headers;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
 using RestaurantManager.Api.Mappings;
 using RestaurantManager.Api.Middlewares;
 using RestaurantManager.Infrastructure;
 using System;
+using System.Text.Json.Serialization;
 
 namespace RestaurantManager.Api
 {
@@ -23,14 +25,18 @@ namespace RestaurantManager.Api
 
             services.AddScoped<EfCoreTransactionMiddleware>();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    var enumConverter = new JsonStringEnumConverter();
+                    options.JsonSerializerOptions.Converters.Add(enumConverter);
+                });
             services.AddOpenApi();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new() { Title = "Restaurant Manager API", Version = "v1" });
 
-                // Add JWT Bearer definition
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",

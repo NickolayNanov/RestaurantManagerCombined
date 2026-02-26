@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { topDishes } from "../../data/dashboard";
 
-export default function TopDishes() {
+const TopDishes = () => {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
@@ -30,3 +30,5 @@ export default function TopDishes() {
     </section>
   );
 }
+
+export default TopDishes;

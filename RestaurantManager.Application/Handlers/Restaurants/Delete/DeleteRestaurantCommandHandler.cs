@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
@@ -13,7 +14,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Delete
     {
         public async Task<DeleteRestaurantResponse> Handle(DeleteRestaurantCommand request, CancellationToken cancellationToken)
         {
-            var restaurant = await restaurantManagerDbContext.Restaurants.FindAsync(request.Id, cancellationToken);
+            var restaurant = await restaurantManagerDbContext.Restaurants.AsNoTracking().FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
             if (restaurant is null)
             {

@@ -48,10 +48,10 @@ namespace RestaurantManager.Api.Middlewares
 
                             logger.LogInformation($"Commited transaction {tx.TransactionId} successfully.");
                         }
-                        catch
+                        catch(Exception ex)
                         {
                             await tx.RollbackAsync(context.RequestAborted);
-                            logger.LogError($"Error during commit of transaction.");
+                            logger.LogError(ex, $"Error during commit of transaction.");
                         }
                     }
                     else

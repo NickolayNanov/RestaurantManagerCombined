@@ -1,9 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { restaurants } from "../../data/dashboard";
 
-function StatusPill({ status }: { status: "Open" | "Closed" }) {
-  
-
+const StatusPill = ({ status }: { status: "Open" | "Closed" }) => {
   const cls =
     status === "Open"
       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
@@ -12,7 +10,7 @@ function StatusPill({ status }: { status: "Open" | "Closed" }) {
   return <span className={`rounded-full border px-2 py-1 text-xs font-medium ${cls}`}>{status}</span>;
 }
 
-export default function RestaurantsOverview() {
+const RestaurantsOverview = () => {
   const navigate = useNavigate();
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -43,3 +41,5 @@ export default function RestaurantsOverview() {
     </section>
   );
 }
+
+export default RestaurantsOverview;
