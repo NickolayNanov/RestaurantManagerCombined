@@ -6,25 +6,22 @@ const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
 
   headers.set("Accept", "application/json");
   headers.set("Content-Type", "application/json");
-  
+
   const res = await fetch(fullEndpoint, {
     credentials: "include", // includes http only cookie
     headers,
     ...options,
   });
-  
+
   if (!res.ok) {
     // TODO: Handle errors and redirect
     const text = await res.text().catch(() => "");
     throw new Error(`HTTP ${res.status} ${res.statusText} ${text}`);
   }
-  
-  if (res.status == 204) {
-    return;
-  }
 
-  const response = await res.json();
-  return response;
+  if (res.status == 200 || res.status == 201) {
+    return await res.json();
+  }
 }
 
 export {

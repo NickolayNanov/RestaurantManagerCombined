@@ -72,7 +72,7 @@ namespace RestaurantManager.Api
         }
 
         // start up configuration of the middlewares pipeline
-        public static WebApplication BuildMiddlewaresPipeline(this WebApplication app)
+        public static async Task<WebApplication> BuildMiddlewaresPipeline(this WebApplication app)
         {
             app.UseExceptionHandler();
 
@@ -98,7 +98,7 @@ namespace RestaurantManager.Api
 
             app.UseMiddleware<EfCoreTransactionMiddleware>();
 
-            app.MigrateDatabase(true);
+            await app.MigrateDatabase(true);
 
             app.MapControllers();
 

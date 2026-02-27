@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using RestaurantManager.Domain.Entities;
+using RestaurantManager.Infrastructure.EF;
 
 namespace RestaurantManager.Infrastructure
 {
@@ -93,11 +94,11 @@ namespace RestaurantManager.Infrastructure
             return services;
         }
 
-        public static WebApplication MigrateDatabase(this WebApplication app, bool seedDatabase = false)
+        public static async Task<WebApplication> MigrateDatabase(this WebApplication app, bool seedDatabase = false)
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<RestaurantManagerDbContext>();
-            dbContext.Database.Migrate();
+            await dbContext.Database.MigrateAsync();
 
             if (seedDatabase)
             {
@@ -108,18 +109,7 @@ namespace RestaurantManager.Infrastructure
                     roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
                 }
 
-                if (!dbContext.Categories.Any())
-                {
-                    dbContext.Categories.AddRange(new List<Category>()
-                    {
-                        new Category() { IsActive = true, Name = "Salads" },
-                        new Category() { IsActive = true, Name = "Main dishes" },
-                        new Category() { IsActive = true, Name = "Deserts" },
-                        new Category() { IsActive = true, Name = "Sides" },
-                        new Category() { IsActive = true, Name = "Prishtqvki" },
-                    });
-                    dbContext.SaveChanges();
-                }
+                await DbSeeder.SeedAsync(app.Services);
             }
 
             return app;

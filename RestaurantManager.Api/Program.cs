@@ -11,6 +11,6 @@ builder.Services.AddApplication(builder.Configuration);
 
 var app = builder.Build();
 
-app.BuildMiddlewaresPipeline();
+await app.BuildMiddlewaresPipeline();
 
 app.Run();

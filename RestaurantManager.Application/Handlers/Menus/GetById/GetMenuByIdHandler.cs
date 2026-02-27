@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RestaurantManager.Application.Exceptions;
@@ -13,23 +14,14 @@ namespace RestaurantManager.Application.Handlers.Menus.GetById
     {
         public async Task<GetMenuByIdResponse> Handle(GetMenuByIdQuery request, CancellationToken cancellationToken)
         {
-            var menu = await restaurantManagerDbContext
-                .Menus
-                .Include(m => m.MenuItems)
-                .ThenInclude(mit => mit.Category)
+            var menu = await restaurantManagerDbContext.Menus
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == request.Id)
+                .Where(m => m.Id == request.Id)
+                .ProjectTo<GetMenuByIdResponse>(mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync()
                 ?? throw new ResourceNotFoundException(nameof(Menu), $"Menu with id {request.Id} was not found.");
 
-            var response = mapper.Map<GetMenuByIdResponse>(menu);
-
-            response.Items = response.Items.Select(i =>
-            {
-                i.CategoryText = menu.MenuItems.First(x => x.Id == i.Id).Category.Name;
-                return i;
-            });
-
-            return response;
+            return menu;
         }
     }
 }
