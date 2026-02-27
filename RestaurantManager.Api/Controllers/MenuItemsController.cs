@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.MenuItems.Create;
 using RestaurantManager.Application.Handlers.MenuItems.Delete;
 using RestaurantManager.Application.Handlers.MenuItems.GetById;
+using RestaurantManager.Application.Handlers.MenuItems.GetByMenu;
 using RestaurantManager.Application.Handlers.MenuItems.GetMany;
 using RestaurantManager.Application.Handlers.MenuItems.Update;
+using RestaurantManager.Application.Handlers.Menus.GetById;
 
 namespace RestaurantManager.Api.Controllers
 {
@@ -35,6 +37,18 @@ namespace RestaurantManager.Api.Controllers
         public async Task<ActionResult<GetMenuItemByIdResponse>> GetById(Guid id)
         {
             var menu = await mediator.Send(new GetMenuItemByIdQuery(id));
+            return Ok(menu);
+        }
+
+        /// <summary>
+        /// Get a menu items by menu id.
+        /// </summary>
+        [HttpGet("by-menu/{menuId:guid}")]
+        [ProducesResponseType(typeof(GetMenuByIdResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetMenuByIdResponse>> GetMyMenu(Guid menuId)
+        {
+            var menu = await mediator.Send(new GetMenuItemsByMenuQuery(menuId));
             return Ok(menu);
         }
 

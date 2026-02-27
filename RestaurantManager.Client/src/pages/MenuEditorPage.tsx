@@ -63,6 +63,16 @@ const MenuEditorPage = () => {
     }
   };
 
+  const fetchMenuItems = async () => {
+    const data = await apiFetch(`api/menu-items/by-menu/${menuId}`, {
+      method: "GET"
+    })
+
+    if (data) {
+      setMenu({ ...menu, items: data.menuItems });
+    }
+  };
+
   const fetchCategoriesData = async () => {
     const categoriesData: ListAllCategoriesApiResponse = await apiFetch("api/categories", {
       method: "GET"
@@ -123,7 +133,7 @@ const MenuEditorPage = () => {
       })
     });
 
-    await fetchMenuData();
+    await fetchMenuItems();
     setItemEditTarget(null);
   };
 
@@ -132,7 +142,7 @@ const MenuEditorPage = () => {
       method: "DELETE"
     });
 
-    await fetchMenuData();
+    await fetchMenuItems();
     setItemDeleteTarget(null);
   };
 

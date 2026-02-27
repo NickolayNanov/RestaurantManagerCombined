@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
 using RestaurantManager.Domain;
 using RestaurantManager.Domain.Entities;
@@ -9,6 +10,7 @@ using RestaurantManager.Domain.Entities;
 namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
 {
     internal class GetRestaurantInfoHandler(
+        ILogger<GetRestaurantInfoHandler> logger,
         IMapper mapper,
         IRestaurantManagerDbContext restaurantManagerDbContext) : IRequestHandler<GetRestaurantInfoQuery, GetRestaurantInfoResponse>
     {
@@ -21,9 +23,13 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
                 .FirstOrDefaultAsync(r => r.Id == request.Id)
                 ?? throw new ResourceNotFoundException(nameof(Restaurant), $"Restaurant with id {request.Id} was not found.");
 
-            var response = mapper.Map<GetRestaurantInfoResponse>(restaurant);
+            if (restaurant is null)
+            {
+                logger.LogError($"Restaurant with id: {request.Id} was not found.");
+                throw new ResourceNotFoundException(nameof(Restaurant), $"Restaurant with id: {request.Id} was not found.");
+            }
 
-            return response;
+            return restaurant;
         }
     }
 }
