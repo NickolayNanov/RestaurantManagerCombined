@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Net.Http.Headers;
+﻿using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
-using RestaurantManager.Api.Mappings;
 using RestaurantManager.Api.Middlewares;
 using RestaurantManager.Infrastructure;
 using System;
@@ -49,9 +47,6 @@ namespace RestaurantManager.Api
             });
 
             services.AddHttpContextAccessor();
-
-            // automapper
-            services.AddAutoMapper(typeof(RestaurantsPresentationProfile).Assembly);
 
             services.AddCors(options =>
              {

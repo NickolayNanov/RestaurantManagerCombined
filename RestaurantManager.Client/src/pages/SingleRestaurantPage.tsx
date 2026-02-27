@@ -10,6 +10,7 @@ import DeleteRestaurantModal from "../components/restaurants/DeleteRestaurantMod
 import EditRestaurantModal from "../components/restaurants/EditRestaurantModal";
 import MenuEditForm from "../components/menus/MenuEditForm";
 import StatusPill from "../components/shared/StatusPill";
+import CategoriesSection from "../components/categories/CategoriesSection";
 
 const cx = (...v: Array<string | false | undefined>) => v.filter(Boolean).join(" ");
 
@@ -291,6 +292,8 @@ const SingleRestaurantPage = () => {
                     </div>
                 )}
             </section>
+
+            <CategoriesSection />
 
             {/* Edit modal */}
             {editTarget && (
