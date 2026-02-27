@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RestaurantManager.Application.Exceptions;
@@ -15,8 +16,8 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetById
         {
             var restaurant = await restaurantManagerDbContext
                 .Restaurants
-                .Include(r => r.Menus)
                 .AsNoTracking()
+                .ProjectTo<GetRestaurantByIdResponse>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(r => r.Id == request.Id)
                 ?? throw new ResourceNotFoundException(nameof(Restaurant), $"Restaurant with id {request.Id} was not found.");
 
