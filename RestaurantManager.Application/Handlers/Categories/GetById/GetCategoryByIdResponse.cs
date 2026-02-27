@@ -5,5 +5,7 @@ namespace RestaurantManager.Application.Handlers.Categories.GetById
     public record GetCategoryByIdResponse : CategoryBase
     {
         public Guid Id { get; set; }
+
+        public int MenuItemsCount { get; set; }
     }
 }

@@ -23,7 +23,7 @@ const MenuItemForm = ({
     const e: Record<string, string> = {};
     if (!x.name.trim()) e.name = "Name is required";
     if (!Number.isFinite(x.price) || x.price <= 0) e.price = "Price must be > 0";
-    if (!x.categoryId.trim()) e.category = "Category is required";
+    if (!x.ca.trim()) e.category = "Category is required";
     return e;
   };
 

@@ -4,6 +4,7 @@ import type { MenuItem } from "../../types/menu-item-types";
 import type { MenuWithItems } from "../../types/menu-types";
 import { useMemo } from "react";
 import { normalizeCategory } from "../helper";
+import type { Category } from "../../types/categories-types";
 
 type MenuItemsSectionProps = {
     setItemCreateOpen: (v: boolean) => void;
@@ -21,18 +22,33 @@ const MenuItemsSection = ({
 
     // ✅ Dynamic grouping by DISTINCT categories from all items
     const grouped = useMemo(() => {
-        const map = new Map<string, MenuItem[]>();
-        for (const it of menu.items) {
-            const cat = normalizeCategory(it.categoryText);
-            if (!map.has(cat)) map.set(cat, []);
-            map.get(cat)!.push(it);
-        }
+        const map = new Map<string, { category: Category, items: MenuItem[] }>();
+
+        menu.items.map(item => {
+            debugger
+            const normalizedCategoryName = normalizeCategory(item.category.name);
+
+            if (!map.has(item.category.id)) {
+                map.set(item.category.id, {
+                    category: {
+                        id: item.category.id,
+                        name: normalizedCategoryName,
+                        isActive: item.category.isActive,
+                        menuItemsCount: item.category.menuItemsCount
+                    },
+                    items: []
+                })
+            }
+
+            map.get(item.category.id)?.items.push(item);
+        });
+
         // Sort categories alphabetically
         return Array.from(map.entries())
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([category, items]) => ({
-                category,
-                items: items.slice().sort((x, y) => x.name.localeCompare(y.name)),
+            .map(([category, group]) => ({
+                category: group.category.name,
+                items: group.items.slice().sort((x, y) => x.name.localeCompare(y.name)),
             }));
     }, [menu.items]);
 
@@ -68,8 +84,8 @@ const MenuItemsSection = ({
                     <tbody className="divide-y divide-slate-100">
                         {grouped.map((g) => (
                             <FragmentCategoryGroup
-                                key={g.category}
                                 category={g.category}
+                                key={g.category}
                                 items={g.items}
                                 onEdit={(it) => setItemEditTarget(it)}
                                 onDelete={(it) => setItemDeleteTarget(it)}

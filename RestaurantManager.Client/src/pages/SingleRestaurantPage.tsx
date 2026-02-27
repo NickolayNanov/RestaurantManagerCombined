@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { Pencil, Trash2, RefreshCw, Store, MapPin, UtensilsCrossed, Plus, ArrowRight } from "lucide-react";
+import { Pencil, Trash2, RefreshCw, MapPin, UtensilsCrossed, Plus, ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { apiFetch } from "../api/apiFetch";
@@ -10,6 +10,8 @@ import DeleteRestaurantModal from "../components/restaurants/DeleteRestaurantMod
 import EditRestaurantModal from "../components/restaurants/EditRestaurantModal";
 import MenuEditForm from "../components/menus/MenuEditForm";
 import StatusPill from "../components/shared/StatusPill";
+import CategoriesSection from "../components/categories/CategoriesSection";
+import EmployeesSection from "../components/employees/EmployeesSection";
 
 const cx = (...v: Array<string | false | undefined>) => v.filter(Boolean).join(" ");
 
@@ -291,6 +293,10 @@ const SingleRestaurantPage = () => {
                     </div>
                 )}
             </section>
+
+            <CategoriesSection />
+
+            <EmployeesSection />
 
             {/* Edit modal */}
             {editTarget && (

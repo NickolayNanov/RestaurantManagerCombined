@@ -11,8 +11,7 @@ namespace RestaurantManager.Application.Mappings
         public MenuItemsApplicationProfile()
         {
             // get
-            this.CreateMap<MenuItem, GetMenuItemByIdResponse>()
-                .ForMember(d => d.CategoryText, opt => opt.MapFrom(s => s.Category.Name));
+            this.CreateMap<MenuItem, GetMenuItemByIdResponse>();
 
             // create
             this.CreateMap<CreateMenuItemCommand, MenuItem>();

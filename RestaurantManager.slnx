@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="TODOs.md" />
+  </Folder>
   <Project Path="RestaurantManager.Api/RestaurantManager.Api.csproj" />
   <Project Path="RestaurantManager.Application/RestaurantManager.Application.csproj" Id="8a4edb38-e550-413f-8e88-ac43818dcb33" />
   <Project Path="RestaurantManager.Client/RestaurantManager.Client.esproj">

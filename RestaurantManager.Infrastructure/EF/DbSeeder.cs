@@ -32,8 +32,7 @@ namespace RestaurantManager.Infrastructure.EF
             // Your Restaurant.OwnerId points to Identity user id (string). Since you didn’t provide ApplicationUser,
             // we seed with stable string ids. If you prefer real Identity users via UserManager<ApplicationUser>,
             // tell me and I’ll adapt.
-            const string owner1 = "9135d76c-0d79-4cdc-bcd3-00bc03f7ecff";
-            const string owner2 = "e068613a-2920-4b3f-a92e-8a4ba7cd007a";
+            const string owner1 = "67e1800d-8e06-4ad2-a890-d6e31f1810e6";
 
             // --------------------------
             // Categories (shared)
@@ -70,7 +69,7 @@ namespace RestaurantManager.Infrastructure.EF
                 cuisine: "Japanese",
                 status: OpenClosed.Open,
                 imgUrl: RestaurantImg("sakura-ramen-house", 1),
-                ownerId: owner2,
+                ownerId: owner1,
                 now: now
             );
 

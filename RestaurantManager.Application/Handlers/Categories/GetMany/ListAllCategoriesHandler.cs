@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RestaurantManager.Application.Handlers.Categories.GetById;
@@ -12,7 +13,12 @@ namespace RestaurantManager.Application.Handlers.Categories.GetMany
     {
         public async Task<GetManyCategoriesResponse> Handle(ListAllCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var menus = await mapper.ProjectTo<GetCategoryByIdResponse>(restaurantManagerDbContext.Categories.AsNoTracking()).ToListAsync() ?? [];
+            var menus = await restaurantManagerDbContext.Categories
+                .AsNoTracking()
+                .AsSplitQuery()
+                .ProjectTo<GetCategoryByIdResponse>(mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
             return new GetManyCategoriesResponse(menus);
         }
     }
