@@ -14,8 +14,8 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
     {
         public async Task<GetRestaurantInfoResponse> Handle(GetRestaurantInfoQuery request, CancellationToken cancellationToken)
         {
-            var restaurant = await restaurantManagerDbContext
-                .Restaurants
+            var restaurant = await restaurantManagerDbContext.Restaurants
+                .AsSplitQuery()
                 .AsNoTracking()
                 .ProjectTo<GetRestaurantInfoResponse>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(r => r.Id == request.Id)
