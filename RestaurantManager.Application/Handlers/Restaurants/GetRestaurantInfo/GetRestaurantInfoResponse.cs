@@ -7,8 +7,6 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
     {
         public Guid Id { get; set; }
 
-        public IEnumerable<GetMenuByIdResponse> Menus { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public string CreatedBy { get; set; }
@@ -16,5 +14,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
         public DateTime? UpdatedAt { get; set; }
 
         public string UpdatedBy { get; set; }
+
+        public IEnumerable<GetMenuByIdResponse> Menus { get; set; }
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Restaurants.Delete;
-using RestaurantManager.Application.Handlers.Restaurants.GetMany;
+using RestaurantManager.Application.Handlers.Restaurants.GetAllRestaurantInfos;
+using RestaurantManager.Application.Handlers.Restaurants.GetById;
+using RestaurantManager.Application.Handlers.Restaurants.GetOwnersRestaurants;
 using RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo;
 using RestaurantManager.Application.Handlers.Restaurants.Update;
 
@@ -21,23 +23,47 @@ namespace RestaurantManager.Api.Controllers
         /// <remarks>
         /// GET /api/restaurants?skip=0&take=20
         /// </remarks>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<GetManyRestaurantsResponse>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GetManyRestaurantsResponse>>> GetAll()
+        [HttpGet("info")]
+        [ProducesResponseType(typeof(IEnumerable<GetAllRestaurantInfosResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GetAllRestaurantInfosResponse>>> GetAllRestaurantInfos()
         {
-            var items = await mediator.Send(new ListAllRestaurantsQuery());
+            var items = await mediator.Send(new GetAllRestaurantInfosQuery());
             return Ok(items);
+        }
+
+        /// <summary>
+        /// Get a restaurant's info by id.
+        /// </summary>
+        [HttpGet("info/{id:guid}")]
+        [ProducesResponseType(typeof(GetRestaurantInfoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetRestaurantInfoResponse>> GetRestaurantInfo(Guid id)
+        {
+            var entity = await mediator.Send(new GetRestaurantInfoQuery(id));
+            return Ok(entity);
         }
 
         /// <summary>
         /// Get a restaurant by id.
         /// </summary>
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(GetRestaurantInfoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetRestaurantByIdResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<GetRestaurantInfoResponse>> GetRestaurantInfo(Guid id)
+        public async Task<ActionResult<GetRestaurantByIdResponse>> GetById(Guid id)
         {
-            var entity = await mediator.Send(new GetRestaurantInfoQuery(id));
+            var entity = await mediator.Send(new GetRestaurantByIdQuery(id));
+            return Ok(entity);
+        }
+
+        /// <summary>
+        /// Get a restaurant by id.
+        /// </summary>
+        [HttpGet()]
+        [ProducesResponseType(typeof(GetOwnersRestaurantsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetOwnersRestaurantsResponse>> GetOwnersRestaurants()
+        {
+            var entity = await mediator.Send(new GetOwnersRestaurantsQuery());
             return Ok(entity);
         }
 
