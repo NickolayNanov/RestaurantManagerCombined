@@ -100,15 +100,17 @@ namespace RestaurantManager.Infrastructure
             var dbContext = scope.ServiceProvider.GetRequiredService<RestaurantManagerDbContext>();
             await dbContext.Database.MigrateAsync();
 
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            
+            if (!roleManager.Roles.Any())
+            {
+                roleManager.CreateAsync(new IdentityRole("Manager")).Wait();
+                roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
+                roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
+            }
+
             if (seedDatabase)
             {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                if (!roleManager.Roles.Any())
-                {
-                    roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
-                    roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
-                }
-
                 await DbSeeder.SeedAsync(app.Services);
             }
 

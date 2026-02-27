@@ -1,54 +1,39 @@
-import React, { useMemo, useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import CategoryModal from "./CategoryModal";
 import { classNames } from "../helper";
 import IconDots from "./IconDots";
 import IconPlus from "./IconPlus";
 import IconSearch from "./IconSearch";
-
-type Category = {
-    id: string;
-    name: string;
-    description?: string;
-    itemCount: number;
-    isVisible: boolean;
-    updatedAt: string; // display string for now
-};
-
-const sampleCategories: Category[] = [
-    {
-        id: "c1",
-        name: "Ramen",
-        description: "Signature bowls and specialty broths.",
-        itemCount: 12,
-        isVisible: true,
-        updatedAt: "2 days ago",
-    },
-    {
-        id: "c2",
-        name: "Gyoza & Sides",
-        description: "Shareable starters and small plates.",
-        itemCount: 7,
-        isVisible: true,
-        updatedAt: "1 week ago",
-    },
-    {
-        id: "c3",
-        name: "Drinks",
-        description: "Soft drinks, tea and Japanese beer.",
-        itemCount: 9,
-        isVisible: false,
-        updatedAt: "3 weeks ago",
-    },
-];
+import { apiFetch } from "../../api/apiFetch";
+import type { Category, ListAllCategoriesApiResponse } from "../../types/categories-types";
 
 const CategoriesSection: React.FC = () => {
-    const [categories, setCategories] = useState<Category[]>(sampleCategories);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [query, setQuery] = useState("");
     const [sort, setSort] = useState<"order" | "name" | "items">("order");
-    const [reorderMode, setReorderMode] = useState(false);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState<Category | null>(null);
+
+    const fetchCategoriesData = async () => {
+        const categoriesData: ListAllCategoriesApiResponse = await apiFetch("api/categories", {
+            method: "GET"
+        })
+
+        if (categoriesData) {
+            setCategories(categoriesData.categories);
+        }
+    };
+
+    const didInit = useRef(false);
+
+    useEffect(() => {
+        if (didInit.current) return;
+        didInit.current = true;
+
+        void fetchCategoriesData();
+    }, []);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -73,44 +58,53 @@ const CategoriesSection: React.FC = () => {
         setModalOpen(true);
     };
 
-    const openEdit = (c: Category) => {
-        setEditing(c);
+    const openEdit = (category: Category) => {
+        setEditing(category);
         setModalOpen(true);
     };
 
-    const toggleVisible = (id: string) => {
+    const toggleVisible = async (category: Category) => {
+        await apiFetch('api/categories', {
+            method: "PUT",
+            body: JSON.stringify({
+                id: category.id,
+                name: category.name,
+                isActive: !category.isActive
+            })
+        });
+
         setCategories((prev) =>
-            prev.map((c) => (c.id === id ? { ...c, isVisible: !c.isVisible } : c))
+            prev.map((c) => (c.id === category.id ? { ...c, isActive: !c.isActive } : c))
         );
     };
 
-    const deleteCategory = (id: string) => {
+    const deleteCategory = async (id: string) => {
+        await apiFetch(`api/categories/${id}`, {
+            method: "DELETE"
+        });
+
         setCategories((prev) => prev.filter((c) => c.id !== id));
     };
 
-    const saveCategory = (payload: { name: string; description?: string; isVisible: boolean }) => {
+    const saveCategory = async (payload: { name: string; isActive: boolean }) => {
         if (editing) {
-            setCategories((prev) =>
-                prev.map((c) =>
-                    c.id === editing.id
-                        ? { ...c, ...payload, updatedAt: "just now" }
-                        : c
-                )
-            );
+            await apiFetch('api/categories', {
+                method: "PUT",
+                body: JSON.stringify({
+                    id: editing.id,
+                    ...payload
+                })
+            });
         } else {
-            setCategories((prev) => [
-                {
-                    id: crypto.randomUUID(),
-                    name: payload.name,
-                    description: payload.description,
-                    isVisible: payload.isVisible,
-                    itemCount: 0,
-                    updatedAt: "just now",
-                },
-                ...prev,
-            ]);
+            await apiFetch('api/categories', {
+                method: "POST",
+                body: JSON.stringify({
+                    ...payload
+                })
+            });
         }
 
+        await fetchCategoriesData();
         setModalOpen(false);
         setEditing(null);
     };
@@ -127,19 +121,6 @@ const CategoriesSection: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={() => setReorderMode((v) => !v)}
-                        className={classNames(
-                            "inline-flex items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium transition",
-                            reorderMode
-                                ? "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                        )}
-                    >
-                        {reorderMode ? "Reorder: On" : "Reorder"}
-                    </button>
-
                     <button
                         type="button"
                         onClick={openCreate}
@@ -168,7 +149,7 @@ const CategoriesSection: React.FC = () => {
                         <label className="text-sm text-slate-500">Sort</label>
                         <select
                             value={sort}
-                            onChange={(e) => setSort(e.target.value as any)}
+                            onChange={(e) => setSort(e.target.value as "order" | "name" | "items")}
                             className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100"
                         >
                             <option value="order">Custom order</option>
@@ -226,28 +207,19 @@ const CategoriesSection: React.FC = () => {
                                                         <div className="truncate text-sm font-semibold text-slate-900">
                                                             {c.name}
                                                         </div>
-                                                        {!c.isVisible && (
+                                                        {!c.isActive && (
                                                             <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-slate-600">
                                                                 Hidden
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {c.description ? (
-                                                        <div className="mt-0.5 line-clamp-1 text-sm text-slate-500">
-                                                            {c.description}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="mt-0.5 text-sm text-slate-400">
-                                                            No description
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Items */}
                                         <div className="sm:col-span-2">
-                                            <div className="text-sm font-medium text-slate-900">{c.itemCount}</div>
+                                            <div className="text-sm font-medium text-slate-900">{c.menuItemsCount}</div>
                                             <div className="text-xs text-slate-500">menu items</div>
                                         </div>
 
@@ -255,26 +227,26 @@ const CategoriesSection: React.FC = () => {
                                         <div className="sm:col-span-2 sm:text-right">
                                             <button
                                                 type="button"
-                                                onClick={() => toggleVisible(c.id)}
+                                                onClick={() => toggleVisible(c)}
                                                 className={classNames(
                                                     "inline-flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm font-medium transition sm:w-auto sm:min-w-[140px]",
-                                                    c.isVisible
+                                                    c.isActive
                                                         ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                                         : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                                                 )}
                                             >
-                                                {c.isVisible ? "Visible" : "Hidden"}
+                                                {c.isActive ? "Visible" : "Hidden"}
                                                 <span
                                                     className={classNames(
                                                         "ml-3 inline-flex h-5 w-9 items-center rounded-full p-0.5 transition",
-                                                        c.isVisible ? "bg-emerald-600" : "bg-slate-300"
+                                                        c.isActive ? "bg-emerald-600" : "bg-slate-300"
                                                     )}
                                                     aria-hidden="true"
                                                 >
                                                     <span
                                                         className={classNames(
                                                             "h-4 w-4 rounded-full bg-white transition",
-                                                            c.isVisible ? "translate-x-4" : "translate-x-0"
+                                                            c.isActive ? "translate-x-4" : "translate-x-0"
                                                         )}
                                                     />
                                                 </span>
@@ -314,7 +286,7 @@ const CategoriesSection: React.FC = () => {
                                     {/* Mobile helper row */}
                                     <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500 sm:hidden">
                                         <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5">
-                                            Items: {c.itemCount}
+                                            Items: {c.menuItemsCount}
                                         </span>
                                     </div>
                                 </li>
@@ -330,8 +302,7 @@ const CategoriesSection: React.FC = () => {
                     title={editing ? "Edit Category" : "Create Category"}
                     initial={{
                         name: editing?.name ?? "",
-                        description: editing?.description ?? "",
-                        isVisible: editing?.isVisible ?? true,
+                        isActive: editing?.isActive ?? true,
                     }}
                     onClose={() => {
                         setModalOpen(false);

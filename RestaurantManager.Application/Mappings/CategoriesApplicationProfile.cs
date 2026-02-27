@@ -2,6 +2,7 @@
 using RestaurantManager.Application.Handlers.Categories.Create;
 using RestaurantManager.Application.Handlers.Categories.GetById;
 using RestaurantManager.Application.Handlers.Categories.Update;
+using RestaurantManager.Application.Handlers.MenuItems.GetById;
 using RestaurantManager.Domain.Entities;
 
 namespace RestaurantManager.Application.Mappings
@@ -12,6 +13,8 @@ namespace RestaurantManager.Application.Mappings
         {
             this.CreateMap<Category, GetCategoryByIdResponse>()
                 .ForMember(x => x.MenuItemsCount, y => y.MapFrom(z => z.MenuItems.Count()));
+
+            this.CreateMap<Category, CategoryBaseWithId>();
 
             this.CreateMap<CreateCategoryCommand, Category>();
             this.CreateMap<Category, CreateCategoryResponse>();

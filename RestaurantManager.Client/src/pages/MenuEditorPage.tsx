@@ -11,31 +11,42 @@ import type { MenuItem } from "../types/menu-item-types";
 import type { MenuWithItems } from "../types/menu-types";
 import ModalShell from "../components/modals/ModalShell";
 import MenuItemForm from "../components/menu-items/MenuItemForm";
-import { seedMenu } from "../data/dashboard";
 import MenuEditForm from "../components/menus/MenuEditForm";
 import { apiFetch } from "../api/apiFetch";
 import { type Category, type ListAllCategoriesApiResponse } from "../types/categories-types";
 import MenuItemsSection from "../components/menu-items/MenuItemsSection";
 import MenuInfoCard from "../components/menus/MenuInfoCard";
+import type { SingleRestaurantApiResponse } from "../types/restaurants";
 
 // ---------- forms ----------
 export type MenuEditValues = Pick<MenuWithItems, "name" | "description" | "imgUrl" | "isActive" | "type">;
-export type MenuItemFormValues = Pick<MenuItem, "name" | "price" | "imgUrl" | "isActive" | "categoryId" | "categoryText">;
+export type MenuItemFormValues = Pick<MenuItem, "name" | "price" | "imgUrl" | "isActive" | "category">;
 
 const emptyItem: MenuItemFormValues = {
   name: "",
   price: 0,
   imgUrl: "",
   isActive: true,
-  categoryId: "",
-  categoryText: ""
+  category: { name: "", id: "", isActive: false, menuItemsCount: 0 }
+};
+
+const initialEmpty: MenuWithItems = {
+  id: "",
+  name: "",
+  description: "",
+  imgUrl: "",
+  isActive: false,
+  type: "Default",
+  restaurantId: "",
+  items: []
 };
 
 const MenuEditorPage = () => {
   const { restaurantId = "r1", menuId = "m1" } = useParams();
   const navigate = useNavigate();
 
-  const [menu, setMenu] = useState<MenuWithItems>(() => seedMenu(restaurantId, menuId));
+  const [menu, setMenu] = useState<MenuWithItems>(initialEmpty);
+  const [restaurant, setRestaurant] = useState<SingleRestaurantApiResponse | null>(null);
   const [categories, setCategories] = useState<Category[]>([])
   const [menuEditOpen, setMenuEditOpen] = useState(false);
   const [itemCreateOpen, setItemCreateOpen] = useState(false);
@@ -49,6 +60,7 @@ const MenuEditorPage = () => {
     if (didInit.current) return;
     didInit.current = true;
 
+    void fetchRestaurantData();
     void fetchMenuData();
     void fetchCategoriesData();
   }, []);
@@ -60,6 +72,16 @@ const MenuEditorPage = () => {
 
     if (menuData) {
       setMenu(menuData);
+    }
+  };
+
+  const fetchRestaurantData = async () => {
+    const restaurantData: SingleRestaurantApiResponse = await apiFetch(`api/restaurants/${restaurantId}`, {
+      method: "GET"
+    })
+
+    if (restaurantData) {
+      setRestaurant(restaurantData);
     }
   };
 
@@ -105,7 +127,7 @@ const MenuEditorPage = () => {
     const newItem = await apiFetch('api/menu-items', {
       method: "POST",
       body: JSON.stringify({
-        categoryId: formData.categoryId,
+        categoryId: formData.category.id,
         menuId: menu.id,
         name: formData.name,
         price: formData.price,
@@ -125,7 +147,7 @@ const MenuEditorPage = () => {
       method: "PUT",
       body: JSON.stringify({
         id,
-        categoryId: formData.categoryId,
+        categoryId: formData.category.id,
         name: formData.name,
         price: formData.price,
         imgUrl: formData.imgUrl,
@@ -158,7 +180,7 @@ const MenuEditorPage = () => {
             </Link>
             <span className="text-slate-400">/</span>
             <Link to={`/manage-restaurants/${restaurantId}`} className="hover:text-slate-900">
-              {restaurantId}
+              {restaurant?.name}
             </Link>
             <span className="text-slate-400">/</span>
             <span className="font-medium text-slate-900">{menu.name}</span>
@@ -233,7 +255,7 @@ const MenuEditorPage = () => {
         </ModalShell>
       )}
 
-      {itemEditTarget && (
+      {itemEditTarget && itemDeleteTarget && (
         <ModalShell title={`Edit: ${itemEditTarget.name}`} onClose={() => setItemEditTarget(null)}>
           <MenuItemForm
             initial={{
@@ -241,8 +263,7 @@ const MenuEditorPage = () => {
               price: itemEditTarget.price,
               imgUrl: itemEditTarget.imgUrl ?? "",
               isActive: itemEditTarget.isActive,
-              categoryId: itemEditTarget.categoryId,
-              categoryText: itemEditTarget.categoryText
+              category: itemDeleteTarget.category
             }}
             categories={categories}
             submitLabel="Save"
