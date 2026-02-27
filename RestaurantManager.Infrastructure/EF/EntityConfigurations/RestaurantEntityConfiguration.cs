@@ -17,6 +17,14 @@ namespace RestaurantManager.Infrastructure.EF.EntityConfigurations
             builder.Property(r => r.Description)
                 .HasMaxLength(500);
 
+            builder.Property(r => r.Location)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(r => r.Cuisine)
+                .IsRequired()
+                .HasMaxLength(75);
+
             builder.HasOne(r => r.Owner)
                 .WithMany(o => o.Restaurants)
                 .HasForeignKey(r => r.OwnerId)

@@ -6,6 +6,12 @@
 
         public string Description { get; set; }
 
+        public string Location { get; set; }
+
+        public string Cuisine { get; set; }
+
+        public OpenClosed Status { get; set; }
+
         public string ImgUrl { get; set; }
 
         public virtual IEnumerable<Menu> Menus { get; set; } = new HashSet<Menu>();

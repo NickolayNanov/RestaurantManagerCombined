@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using RestaurantManager.Domain.Entities;
+using RestaurantManager.Infrastructure.EF;
 
 namespace RestaurantManager.Infrastructure
 {
@@ -71,6 +73,17 @@ namespace RestaurantManager.Infrastructure
                         RoleClaimType = ClaimTypes.Role,
                         NameClaimType = ClaimTypes.NameIdentifier
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (context.Request.Cookies.TryGetValue("access_token", out var token))
+                                context.Token = token;
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             services.AddAuthorization(options =>
@@ -81,18 +94,22 @@ namespace RestaurantManager.Infrastructure
             return services;
         }
 
-        public static WebApplication MigrateDatabase(this WebApplication app, bool seedDatabase = false)
+        public static async Task<WebApplication> MigrateDatabase(this WebApplication app, bool seedDatabase = false)
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<RestaurantManagerDbContext>();
-            dbContext.Database.Migrate();
+            await dbContext.Database.MigrateAsync();
 
             if (seedDatabase)
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                if (!roleManager.Roles.Any())
+                {
+                    roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
+                    roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
+                }
 
-                roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
-                roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
+                await DbSeeder.SeedAsync(app.Services);
             }
 
             return app;

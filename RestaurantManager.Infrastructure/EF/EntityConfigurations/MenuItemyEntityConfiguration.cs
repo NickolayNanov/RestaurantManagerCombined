@@ -25,10 +25,10 @@ namespace RestaurantManager.Infrastructure.EF.EntityConfigurations
                 .HasForeignKey(mi => mi.MenuId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(mi => mi.MenuItemCategories)
-                .WithOne(mic => mic.MenuItem)
-                .HasForeignKey(mic => mic.MenuItemId)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(mi => mi.Category)
+                .WithMany(mic => mic.MenuItems)
+                .HasForeignKey(mic => mic.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

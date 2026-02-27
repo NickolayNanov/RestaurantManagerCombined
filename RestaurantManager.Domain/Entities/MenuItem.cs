@@ -14,6 +14,8 @@
 
         public virtual Menu Menu { get; set; }
 
-        public virtual IEnumerable<MenuItemCategory> MenuItemCategories { get; set; } = new HashSet<MenuItemCategory>();
+        public Guid CategoryId { get; set; }
+
+        public virtual Category Category { get; set; }
     }
 }

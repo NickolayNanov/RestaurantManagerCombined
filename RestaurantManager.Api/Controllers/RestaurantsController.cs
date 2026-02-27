@@ -1,15 +1,13 @@
-﻿using AutoMapper;
-using Azure;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Restaurants.Delete;
+using RestaurantManager.Application.Handlers.Restaurants.GetAllRestaurantInfos;
 using RestaurantManager.Application.Handlers.Restaurants.GetById;
-using RestaurantManager.Application.Handlers.Restaurants.GetMany;
+using RestaurantManager.Application.Handlers.Restaurants.GetOwnersRestaurants;
+using RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo;
 using RestaurantManager.Application.Handlers.Restaurants.Update;
-using RestaurantManager.Application.Handlers.Users.Create;
-using RestaurantManager.Domain.Entities;
 
 namespace RestaurantManager.Api.Controllers
 {
@@ -17,29 +15,32 @@ namespace RestaurantManager.Api.Controllers
     [Authorize]
     [Route("api/restaurants")]
     [Produces("application/json")]
-    public class RestaurantsController : ControllerBase
+    public class RestaurantsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator mediator;
-        private readonly IMapper _mapper;
-
-        public RestaurantsController(IMediator mediator, IMapper mapper)
-        {
-            this.mediator = mediator;
-            this._mapper = mapper;
-        }
-
         /// <summary>
         /// List restaurants (supports basic pagination via skip/take).
         /// </summary>
         /// <remarks>
         /// GET /api/restaurants?skip=0&take=20
         /// </remarks>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<GetManyRestaurantsResponse>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GetManyRestaurantsResponse>>> GetAll()
+        [HttpGet("info")]
+        [ProducesResponseType(typeof(IEnumerable<GetAllRestaurantInfosResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GetAllRestaurantInfosResponse>>> GetAllRestaurantInfos()
         {
-            var items = await mediator.Send(new ListAllRestaurantsQuery());
+            var items = await mediator.Send(new GetAllRestaurantInfosQuery());
             return Ok(items);
+        }
+
+        /// <summary>
+        /// Get a restaurant's info by id.
+        /// </summary>
+        [HttpGet("info/{id:guid}")]
+        [ProducesResponseType(typeof(GetRestaurantInfoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetRestaurantInfoResponse>> GetRestaurantInfo(Guid id)
+        {
+            var entity = await mediator.Send(new GetRestaurantInfoQuery(id));
+            return Ok(entity);
         }
 
         /// <summary>
@@ -55,14 +56,26 @@ namespace RestaurantManager.Api.Controllers
         }
 
         /// <summary>
+        /// Get a restaurant by id.
+        /// </summary>
+        [HttpGet()]
+        [ProducesResponseType(typeof(GetOwnersRestaurantsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetOwnersRestaurantsResponse>> GetOwnersRestaurants()
+        {
+            var entity = await mediator.Send(new GetOwnersRestaurantsQuery());
+            return Ok(entity);
+        }
+
+        /// <summary>
         /// Create a restaurant.
         /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(CreateRestaurantResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromBody] CreateRestaurantCommand dto)
+        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromBody] CreateRestaurantCommand command)
         {
-            var result = await mediator.Send(dto);
+            var result = await mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -70,7 +83,6 @@ namespace RestaurantManager.Api.Controllers
         /// Full update (replace) of a restaurant.
         /// </summary>
         [HttpPut]
-        [Authorize] // optionally: [Authorize(Roles = "Owner,Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -84,7 +96,6 @@ namespace RestaurantManager.Api.Controllers
         /// Delete a restaurant.
         /// </summary>
         [HttpDelete("{id:guid}")]
-        [Authorize] // optionally: [Authorize(Roles = "Owner,Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)

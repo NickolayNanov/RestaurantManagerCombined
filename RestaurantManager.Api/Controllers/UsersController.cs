@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Users.Create;
 using RestaurantManager.Application.Handlers.Users.GetById;
+using RestaurantManager.Application.Handlers.Users.UserInfo;
 
 namespace RestaurantManager.Api.Controllers
 {
@@ -34,6 +34,15 @@ namespace RestaurantManager.Api.Controllers
         public async Task<ActionResult<GetUserByIdResponse>> GetById(string id)
         {
             var result = await mediator.Send(new GetUserByIdQuery(id));
+            return Ok(result);
+        }
+
+        [HttpGet("user-info")]
+        [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<UserInfoResponse>> UserInfo()
+        {
+            var result = await mediator.Send(new UserInfoResponseQuery());
             return Ok(result);
         }
     }

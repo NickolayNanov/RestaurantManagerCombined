@@ -2,5 +2,5 @@
 
 namespace RestaurantManager.Application.Handlers.Restaurants.GetById
 {
-    public record GetRestaurantByIdQuery(Guid? Id) : IRequest<GetRestaurantByIdResponse>;
+    public record GetRestaurantByIdQuery(Guid Id) : IRequest<GetRestaurantByIdResponse>;
 }

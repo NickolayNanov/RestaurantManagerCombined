@@ -25,7 +25,7 @@ namespace RestaurantManager.Application.Handlers.Auth
             if (user is null)
             {
                 logger.LogError($"Not found user with email: {request.Email}");
-                throw new ResourceNotFoundException(nameof(ApplicationUser), $"User with email: {request.Email} not found.");
+                throw new ResourceNotFoundException(nameof(ApplicationUser), $"User with email: {request.Email} was not found.");
             }
 
             var signInResult = await signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, false);

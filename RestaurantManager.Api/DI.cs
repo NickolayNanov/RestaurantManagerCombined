@@ -1,8 +1,11 @@
-﻿using Microsoft.OpenApi;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi;
 using RestaurantManager.Api.Mappings;
 using RestaurantManager.Api.Middlewares;
 using RestaurantManager.Infrastructure;
 using System;
+using System.Text.Json.Serialization;
 
 namespace RestaurantManager.Api
 {
@@ -22,14 +25,18 @@ namespace RestaurantManager.Api
 
             services.AddScoped<EfCoreTransactionMiddleware>();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    var enumConverter = new JsonStringEnumConverter();
+                    options.JsonSerializerOptions.Converters.Add(enumConverter);
+                });
             services.AddOpenApi();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new() { Title = "Restaurant Manager API", Version = "v1" });
 
-                // Add JWT Bearer definition
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -46,11 +53,26 @@ namespace RestaurantManager.Api
             // automapper
             services.AddAutoMapper(typeof(RestaurantsPresentationProfile).Assembly);
 
+            services.AddCors(options =>
+             {
+                 var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+                 options.AddPolicy("ClientApp", policy =>
+                 {
+                     policy
+                         .WithOrigins(allowedOrigins)
+                         .AllowAnyMethod()
+                         .AllowAnyHeader()
+                         .AllowCredentials()
+                         .WithExposedHeaders(HeaderNames.WWWAuthenticate);
+                 });
+             });
+
             return services;
         }
 
         // start up configuration of the middlewares pipeline
-        public static WebApplication BuildMiddlewaresPipeline(this WebApplication app)
+        public static async Task<WebApplication> BuildMiddlewaresPipeline(this WebApplication app)
         {
             app.UseExceptionHandler();
 
@@ -68,6 +90,7 @@ namespace RestaurantManager.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("ClientApp");
             app.UseIdentityAndRoles();
 
             app.UseSwagger();
@@ -75,7 +98,7 @@ namespace RestaurantManager.Api
 
             app.UseMiddleware<EfCoreTransactionMiddleware>();
 
-            app.MigrateDatabase(true);
+            await app.MigrateDatabase();
 
             app.MapControllers();
 
