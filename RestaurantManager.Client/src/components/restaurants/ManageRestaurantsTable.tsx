@@ -52,7 +52,7 @@ const ManageRestaurantsTable = ({
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
-                      <Building2 className="h-4 w-4" />
+                      <img src={r.imgUrl} alt={r.name} className="h-full w-full object-cover" />
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-slate-900">{r.name}</div>

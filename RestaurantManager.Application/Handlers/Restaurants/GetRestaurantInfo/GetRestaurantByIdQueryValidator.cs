@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 
-namespace RestaurantManager.Application.Handlers.Restaurants.GetById
+namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
 {
-    public class GetRestaurantByIdQueryValidator : ApplicationValidator<GetRestaurantByIdQuery>
+    public class GetRestaurantByIdQueryValidator : ApplicationValidator<GetRestaurantInfoQuery>
     {
         public GetRestaurantByIdQueryValidator()
         {

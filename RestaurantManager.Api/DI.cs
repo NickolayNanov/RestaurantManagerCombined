@@ -98,7 +98,7 @@ namespace RestaurantManager.Api
 
             app.UseMiddleware<EfCoreTransactionMiddleware>();
 
-            await app.MigrateDatabase(true);
+            await app.MigrateDatabase();
 
             app.MapControllers();
 

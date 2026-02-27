@@ -6,22 +6,22 @@ using RestaurantManager.Application.Exceptions;
 using RestaurantManager.Domain;
 using RestaurantManager.Domain.Entities;
 
-namespace RestaurantManager.Application.Handlers.Restaurants.GetById
+namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
 {
-    internal class GetRestaurantByIdHandler(
+    internal class GetRestaurantInfoHandler(
         IMapper mapper,
-        IRestaurantManagerDbContext restaurantManagerDbContext) : IRequestHandler<GetRestaurantByIdQuery, GetRestaurantByIdResponse>
+        IRestaurantManagerDbContext restaurantManagerDbContext) : IRequestHandler<GetRestaurantInfoQuery, GetRestaurantInfoResponse>
     {
-        public async Task<GetRestaurantByIdResponse> Handle(GetRestaurantByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetRestaurantInfoResponse> Handle(GetRestaurantInfoQuery request, CancellationToken cancellationToken)
         {
             var restaurant = await restaurantManagerDbContext
                 .Restaurants
                 .AsNoTracking()
-                .ProjectTo<GetRestaurantByIdResponse>(mapper.ConfigurationProvider)
+                .ProjectTo<GetRestaurantInfoResponse>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(r => r.Id == request.Id)
                 ?? throw new ResourceNotFoundException(nameof(Restaurant), $"Restaurant with id {request.Id} was not found.");
 
-            var response = mapper.Map<GetRestaurantByIdResponse>(restaurant);
+            var response = mapper.Map<GetRestaurantInfoResponse>(restaurant);
 
             return response;
         }

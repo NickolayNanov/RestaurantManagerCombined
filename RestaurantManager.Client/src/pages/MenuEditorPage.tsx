@@ -148,7 +148,7 @@ const MenuEditorPage = () => {
             </Link>
             <span className="text-slate-400">/</span>
             <Link to={`/manage-restaurants/${restaurantId}`} className="hover:text-slate-900">
-              Restaurant
+              {restaurantId}
             </Link>
             <span className="text-slate-400">/</span>
             <span className="font-medium text-slate-900">{menu.name}</span>

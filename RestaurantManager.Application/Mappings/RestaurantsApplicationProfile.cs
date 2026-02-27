@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
-using RestaurantManager.Application.Handlers.Restaurants.GetById;
+using RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo;
 using RestaurantManager.Application.Handlers.Restaurants.Update;
 using RestaurantManager.Domain.Entities;
 
@@ -19,7 +19,7 @@ namespace RestaurantManager.Application.Mappings
             this.CreateMap<Restaurant, UpdateRestaurantResponse>();
 
             // gets
-            this.CreateMap<Restaurant, GetRestaurantByIdResponse>();
+            this.CreateMap<Restaurant, GetRestaurantInfoResponse>();
         }
     }
 }

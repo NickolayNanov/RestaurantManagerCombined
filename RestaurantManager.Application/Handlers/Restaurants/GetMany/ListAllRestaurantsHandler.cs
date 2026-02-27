@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using RestaurantManager.Application.Handlers.Restaurants.GetById;
+using RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo;
 using RestaurantManager.Domain;
 
 namespace RestaurantManager.Application.Handlers.Restaurants.GetMany
@@ -15,7 +15,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetMany
         {
             var restaurants = await restaurantManagerDbContext.Restaurants
                 .AsNoTracking()
-                .ProjectTo<GetRestaurantByIdResponse>(mapper.ConfigurationProvider)
+                .ProjectTo<GetRestaurantInfoResponse>(mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return new GetManyRestaurantsResponse(restaurants);
