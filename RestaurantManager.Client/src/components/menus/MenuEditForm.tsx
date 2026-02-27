@@ -9,7 +9,7 @@ const MenuEditForm = ({
 }: {
   initial: MenuForm;
   onCancel: () => void;
-  onSubmit: (v: MenuForm) => void;
+  onSubmit: (v: MenuForm) => Promise<void>;
 }) => {
   const [form, setForm] = useState<MenuForm>(initial);
   const [err, setErr] = useState<Record<string, string>>({});
@@ -23,12 +23,12 @@ const MenuEditForm = ({
     return e;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eMap = validate(form);
     setErr(eMap);
     if (Object.keys(eMap).length) return;
-    onSubmit(form);
+    await onSubmit(form);
   };
 
   return (
@@ -91,10 +91,10 @@ const MenuEditForm = ({
           <select
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
             value={form.isActive ? "active" : "inactive"}
-            onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.value === "true" }))}
+            onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.value === "active" }))}
           >
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
       </div>

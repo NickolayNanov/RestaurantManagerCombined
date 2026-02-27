@@ -13,5 +13,7 @@ namespace RestaurantManager.Application.Handlers.Menus.Shared
         public bool IsActive { get; set; }
 
         public MenuType Type { get; set; }
+
+        public Guid? RestaurantId { get; set; }
     }
 }

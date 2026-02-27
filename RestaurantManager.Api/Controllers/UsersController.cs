@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Users.Create;
 using RestaurantManager.Application.Handlers.Users.GetById;
-using RestaurantManager.Application.Handlers.Users.Me;
+using RestaurantManager.Application.Handlers.Users.UserInfo;
 
 namespace RestaurantManager.Api.Controllers
 {

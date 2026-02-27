@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using RestaurantManager.Application.Handlers.Restaurants.GetById;
+using RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo;
 using RestaurantManager.Domain;
 
 namespace RestaurantManager.Application.Handlers.Restaurants.GetMany
@@ -12,8 +13,12 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetMany
     {
         public async Task<GetManyRestaurantsResponse> Handle(ListAllRestaurantsQuery request, CancellationToken cancellationToken)
         {
-            var items = await mapper.ProjectTo<GetRestaurantByIdResponse>(restaurantManagerDbContext.Restaurants.AsNoTracking()).ToListAsync() ?? [];
-            return new GetManyRestaurantsResponse(items);
+            var restaurants = await restaurantManagerDbContext.Restaurants
+                .AsNoTracking()
+                .ProjectTo<GetRestaurantInfoResponse>(mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new GetManyRestaurantsResponse(restaurants);
         }
     }
 }

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Restaurants.Delete;
-using RestaurantManager.Application.Handlers.Restaurants.GetById;
 using RestaurantManager.Application.Handlers.Restaurants.GetMany;
+using RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo;
 using RestaurantManager.Application.Handlers.Restaurants.Update;
 
 namespace RestaurantManager.Api.Controllers
@@ -33,11 +33,11 @@ namespace RestaurantManager.Api.Controllers
         /// Get a restaurant by id.
         /// </summary>
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(GetRestaurantByIdResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetRestaurantInfoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<GetRestaurantByIdResponse>> GetById(Guid id)
+        public async Task<ActionResult<GetRestaurantInfoResponse>> GetRestaurantInfo(Guid id)
         {
-            var entity = await mediator.Send(new GetRestaurantByIdQuery(id));
+            var entity = await mediator.Send(new GetRestaurantInfoQuery(id));
             return Ok(entity);
         }
 

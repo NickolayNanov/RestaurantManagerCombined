@@ -23,6 +23,7 @@ namespace RestaurantManager.Application.Handlers.Menus.Update
 
             var entity = mapper.Map<Menu>(request);
 
+            entity.RestaurantId = menu.RestaurantId;
             entity.CreatedBy = menu.CreatedBy;
             entity.CreatedAt = menu.CreatedAt;
             entity.UpdatedAt = DateTime.UtcNow;

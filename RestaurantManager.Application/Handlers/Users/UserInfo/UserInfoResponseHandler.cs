@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using RestaurantManager.Application.Services.Interfaces;
 using RestaurantManager.Domain;
 
-namespace RestaurantManager.Application.Handlers.Users.Me
+namespace RestaurantManager.Application.Handlers.Users.UserInfo
 {
     internal class UserInfoResponseHandler(
         ICurrentUserService currentUserService,

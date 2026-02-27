@@ -1,30 +1,19 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Pencil, Trash2, RefreshCw, Store, MapPin, UtensilsCrossed, Plus, ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { apiFetch } from "../api/apiFetch";
-import type { RestaurantFormValues, RestaurantStatus, RestaurantWithMenu, SingleRestaurantApiResponse } from "../types/restaurants";
+import type { RestaurantFormValues, RestaurantWithMenu, SingleRestaurantApiResponse } from "../types/restaurants";
 import type { Menu, MenuForm } from "../types/menu-types";
 import ModalShell from "../components/modals/ModalShell";
 import DeleteRestaurantModal from "../components/restaurants/DeleteRestaurantModal";
 import EditRestaurantModal from "../components/restaurants/EditRestaurantModal";
 import MenuEditForm from "../components/menus/MenuEditForm";
+import StatusPill from "../components/shared/StatusPill";
 
 const cx = (...v: Array<string | false | undefined>) => v.filter(Boolean).join(" ");
 
-const StatusPill = ({ status }: { status: RestaurantStatus }) => {
-    const cls =
-        status === "Open"
-            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-            : "border-rose-200 bg-rose-50 text-rose-700";
-
-    return (
-        <span className={cx("inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold", cls)}>
-            {status}
-        </span>
-    );
-};
-
-const SingleRestaurantPage = ({ }) => {
+const SingleRestaurantPage = () => {
     const { restaurantId } = useParams();
     const navigate = useNavigate();
     const [restaurant, setRestaurant] = useState<RestaurantWithMenu | null>(null);
@@ -36,13 +25,6 @@ const SingleRestaurantPage = ({ }) => {
 
     const didInit = useRef(false);
 
-    useEffect(() => {
-        if (didInit.current) return;
-        didInit.current = true;
-
-        void fetchRestaurant();
-    }, []);
-
     const fetchRestaurant = async () => {
         const restaurantData: SingleRestaurantApiResponse = await apiFetch(`api/restaurants/${restaurantId}`, {
             method: "GET"
@@ -52,6 +34,13 @@ const SingleRestaurantPage = ({ }) => {
             setRestaurant(restaurantData);
         }
     }
+
+    useEffect(() => {
+        if (didInit.current) return;
+        didInit.current = true;
+
+        void fetchRestaurant();
+    }, []);
 
     const activeMenu = useMemo(() => {
         if (!restaurant) return null;
@@ -98,9 +87,9 @@ const SingleRestaurantPage = ({ }) => {
             body: JSON.stringify(formData)
         });
         if (menu && restaurant) {
-            const newData: RestaurantWithMenu = { 
-                ...restaurant, 
-                menus: [...restaurant!.menus, menu] 
+            const newData: RestaurantWithMenu = {
+                ...restaurant,
+                menus: [...restaurant!.menus, menu]
             };
 
             setRestaurant(newData);
@@ -114,7 +103,7 @@ const SingleRestaurantPage = ({ }) => {
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="text-sm text-slate-700">Restaurant not found.</div>
                 <Link
-                    to="/restaurants"
+                    to="/manage-restaurants"
                     className="mt-3 inline-flex rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                     Back to Restaurants
@@ -171,7 +160,7 @@ const SingleRestaurantPage = ({ }) => {
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex items-start gap-4">
                         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-800">
-                            <Store className="h-6 w-6" />
+                            <img src={restaurant.imgUrl} alt={restaurant.name} className="h-full w-full object-cover" />
                         </div>
 
                         <div>
@@ -263,7 +252,7 @@ const SingleRestaurantPage = ({ }) => {
                         <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 md:flex-row md:items-center md:justify-between">
                             <div className="flex items-start gap-4">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-800">
-                                    <UtensilsCrossed className="h-5 w-5" />
+                                    <img src={selectedMenu.imgUrl} alt={selectedMenu.name} className="h-full w-full object-cover" />
                                 </div>
 
                                 <div>

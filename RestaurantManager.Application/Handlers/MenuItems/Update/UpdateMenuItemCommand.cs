@@ -6,5 +6,7 @@ namespace RestaurantManager.Application.Handlers.MenuItems.Update
     public record UpdateMenuItemCommand : MenuItemBase, IRequest<UpdateMenuItemResponse>
     {
         public Guid? Id { get; set; }
+
+        public Guid? CategoryId { get; set; }
     }
 }

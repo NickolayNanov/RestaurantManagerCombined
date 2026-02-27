@@ -15,7 +15,7 @@ export type MenuWithItems = Menu & {
 };
 
 export type MenuForm = {
-  id: string|null;
+  id: string | null;
   name: string;
   description: string;
   imgUrl: string;

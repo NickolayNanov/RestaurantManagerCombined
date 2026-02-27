@@ -1,9 +1,9 @@
 ﻿using RestaurantManager.Application.Handlers.Menus.GetById;
 using RestaurantManager.Application.Handlers.Restaurants.SharedModels;
 
-namespace RestaurantManager.Application.Handlers.Restaurants.GetById
+namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
 {
-    public record GetRestaurantByIdResponse : RestaurantBase
+    public record GetRestaurantInfoResponse : RestaurantBase
     {
         public Guid Id { get; set; }
 
