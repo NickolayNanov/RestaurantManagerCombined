@@ -15,6 +15,7 @@ namespace RestaurantManager.Infrastructure.EF.EntityConfigurations
                 .HasMaxLength(100);
 
             builder.Property(mi => mi.Price)
+                .HasColumnName("DECIMAL(18,4)")
                 .IsRequired();
 
             builder.Property(mi => mi.IsActive)
