@@ -62,6 +62,7 @@ namespace RestaurantManager.Api
                         Instance = httpContext.Request.Path
                     };
                     break;
+
                 case InvalidOperationException:
                     problem = new ProblemDetails
                     {
@@ -72,11 +73,6 @@ namespace RestaurantManager.Api
                         Instance = httpContext.Request.Path
                     };
                     break;
-
-                // Example custom exceptions:
-                // case NotFoundException nf:
-                //     problem = new ProblemDetails { Status = 404, Title = "Not found", Detail = nf.Message, Type = "https://httpstatuses.com/404" };
-                //     break;
 
                 default:
                     problem = new ProblemDetails
