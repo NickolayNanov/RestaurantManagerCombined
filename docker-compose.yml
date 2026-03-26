@@ -1,0 +1,17 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: restaurantmanager-sqlserver
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: 1
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "P3rp3ric0n2010"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+volumes:
+  sqlserver_data:

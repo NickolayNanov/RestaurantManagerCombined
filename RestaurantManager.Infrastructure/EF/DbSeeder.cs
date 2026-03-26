@@ -69,7 +69,7 @@ namespace RestaurantManager.Infrastructure.EF
                 cuisine: "Japanese",
                 status: OpenClosed.Open,
                 imgUrl: RestaurantImg("sakura-ramen-house", 1),
-                ownerId: owner1,
+                ownerId: owner2,
                 now: now
             );
 

@@ -20,7 +20,7 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
 
             if (employee is null)
             {
-                logger.LogError($"Could not find employee with id: {request.Id}");
+                logger.LogError($"Could not find employee with id to update: {request.Id}");
                 throw new ResourceNotFoundException(nameof(Employee), $"Could not find employee with id: {request.Id}");
             }
 
