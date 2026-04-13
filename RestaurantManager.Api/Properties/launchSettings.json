@@ -1,5 +1,14 @@
 {
   "profiles": {
+    "https_relase": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "dotnetRunMessages": true,
+      "launchUrl": "https://localhost:7122/swagger",
+      "applicationUrl": "https://localhost:7122;http://localhost:5143"
+    },
     "https": {
       "commandName": "Project",
       "environmentVariables": {
@@ -8,6 +17,7 @@
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7122;http://localhost:5143"
     },
+
     "http": {
       "commandName": "Project",
       "environmentVariables": {

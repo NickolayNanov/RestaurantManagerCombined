@@ -13,6 +13,8 @@ namespace RestaurantManager.Domain
 
         public DbSet<MenuItem> MenuItems { get; set; }
 
+        public DbSet<Employee> Employees { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken ct = default);
 
         int SaveChanges();

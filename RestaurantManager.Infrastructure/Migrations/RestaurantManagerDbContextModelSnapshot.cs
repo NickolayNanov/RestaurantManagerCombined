@@ -251,6 +251,60 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("RestaurantManager.Domain.Entities.Employee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("EmploymentType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Employees");
+                });
+
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Menu", b =>
                 {
                     b.Property<Guid>("Id")
@@ -327,7 +381,8 @@ namespace RestaurantManager.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("DECIMAL(18,4)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -448,6 +503,17 @@ namespace RestaurantManager.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RestaurantManager.Domain.Entities.Employee", b =>
+                {
+                    b.HasOne("RestaurantManager.Domain.Entities.Restaurant", "Restaurant")
+                        .WithMany("Employees")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Menu", b =>
                 {
                     b.HasOne("RestaurantManager.Domain.Entities.Restaurant", "Restaurant")
@@ -505,6 +571,8 @@ namespace RestaurantManager.Infrastructure.Migrations
 
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Restaurant", b =>
                 {
+                    b.Navigation("Employees");
+
                     b.Navigation("Menus");
                 });
 #pragma warning restore 612, 618

@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using RestaurantManager.Application.Handlers.Restaurants.Create;
-
+﻿using RestaurantManager.Application.Handlers.Auth;
 namespace RestaurantManager.Application.Handlers.Restaurants.Update
 {
     public class UpdateRestaurantCommandValidator : ApplicationValidator<UpdateRestaurantCommand>
@@ -8,46 +6,32 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
         public UpdateRestaurantCommandValidator()
         {
             this.RuleFor(x => x.Id)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
-                    .WithMessage(NullOrEmptyMessage);
+                .NotNullNotEmptyRequired();
 
             this.RuleFor(x => x.OwnerId)
-                .Cascade(CascadeMode.Stop)
-                .Must(x => x != Guid.Empty)
-                    .When(x => x is not null)
-                    .WithMessage(NullOrEmptyMessage);
+                .NotNullNotEmptyRequired();
 
             this.RuleFor(x => x.Name)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
-                    .WithMessage(NullOrEmptyMessage)
-                .MaximumLength(50)
-                    .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Name), 3, 50))
-                .MinimumLength(3)
-                    .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Name), 3, 50));
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
 
             this.RuleFor(x => x.Description)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
-                    .WithMessage(NullOrEmptyMessage)
-                .MaximumLength(200)
-                    .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Description), 1, 200))
-                .MinimumLength(1)
-                    .WithMessage(string.Format(StringLengthErrorMessage, nameof(CreateRestaurantCommand.Description), 1, 200));
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
+
+            this.RuleFor(x => x.Location)
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
+
+            this.RuleFor(x => x.Cuisine)
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
+
+            ValidatorsExtensions.IsInEnum(this.RuleFor(x => x.Status));
 
             this.RuleFor(x => x.ImgUrl)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
-                    .WithMessage(NullOrEmptyMessage);
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
         }
     }
 }

@@ -10,22 +10,30 @@ using System.Text;
 using System.Security.Claims;
 using RestaurantManager.Domain.Entities;
 using RestaurantManager.Infrastructure.EF;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace RestaurantManager.Infrastructure
 {
     public static class DI
     {
-        public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static void AddInfrastructure(this IServiceCollection services,
+            IConfiguration configuration,
+            IWebHostEnvironment env)
         {
             services
-                .AddPersistence(configuration)
+                .AddPersistence(configuration, env)
                 .AddIdentityAndRoles(configuration);
         }
 
-        private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddPersistence(this IServiceCollection services,
+            IConfiguration configuration,
+            IWebHostEnvironment env)
         {
+            var connectionStringName = env.IsProduction() ? "Production" : "Local";
+
             services.AddDbContext<IRestaurantManagerDbContext, RestaurantManagerDbContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("Default"),
+                    options.UseSqlServer(configuration.GetConnectionString(connectionStringName),
                     b => b.MigrationsAssembly(typeof(RestaurantManagerDbContext).Assembly.GetName().Name)));
 
             return services;
@@ -100,15 +108,16 @@ namespace RestaurantManager.Infrastructure
             var dbContext = scope.ServiceProvider.GetRequiredService<RestaurantManagerDbContext>();
             await dbContext.Database.MigrateAsync();
 
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            if (!roleManager.Roles.Any())
+            {
+                await roleManager.CreateAsync(new IdentityRole("Owner"));
+                await roleManager.CreateAsync(new IdentityRole("Manager"));
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
             if (seedDatabase)
             {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                if (!roleManager.Roles.Any())
-                {
-                    roleManager.CreateAsync(new IdentityRole("Owner")).Wait();
-                    roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
-                }
-
                 await DbSeeder.SeedAsync(app.Services);
             }
 

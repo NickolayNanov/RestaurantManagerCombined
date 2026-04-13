@@ -16,6 +16,8 @@
 
         public virtual IEnumerable<Menu> Menus { get; set; } = new HashSet<Menu>();
 
+        public virtual IEnumerable<Employee> Employees { get; set; }
+
         public string OwnerId { get; set; }
 
         public ApplicationUser Owner { get; set; }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using RestaurantManager.Application.Handlers.Auth;
 
 namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
 {
@@ -7,11 +8,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.GetRestaurantInfo
         public GetRestaurantByIdQueryValidator()
         {
             this.RuleFor(x => x.Id)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                    .WithMessage(NullOrEmptyMessage)
-                .NotEmpty()
-                    .WithMessage(NullOrEmptyMessage);
+                .NotNullNotEmptyRequired();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using RestaurantManager.Application.Handlers.MenuItems.Shared;
+﻿using RestaurantManager.Application.Handlers.Categories.Shared;
+using RestaurantManager.Application.Handlers.MenuItems.Shared;
 
 namespace RestaurantManager.Application.Handlers.MenuItems.GetById
 {
@@ -8,9 +9,7 @@ namespace RestaurantManager.Application.Handlers.MenuItems.GetById
 
         public Guid MenuId { get; set; }
 
-        public Guid CategoryId { get; set; }
-
-        public string CategoryText { get; set; }
+        public CategoryBaseWithId Category { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
@@ -19,5 +18,10 @@ namespace RestaurantManager.Application.Handlers.MenuItems.GetById
         public DateTime? UpdatedAt { get; set; }
 
         public string UpdatedBy { get; set; }
+    }
+
+    public record CategoryBaseWithId : CategoryBase
+    {
+        public Guid Id { get; set; }
     }
 }

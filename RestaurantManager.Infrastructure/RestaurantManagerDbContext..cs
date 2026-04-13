@@ -18,6 +18,8 @@ namespace RestaurantManager.Infrastructure
 
         public virtual DbSet<MenuItem> MenuItems { get; set; }
 
+        public virtual DbSet<Employee> Employees { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(MenuEntityConfiguration).Assembly);

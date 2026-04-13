@@ -34,9 +34,9 @@ namespace RestaurantManager.Api
 
                         problem = new ValidationProblemDetails(errors)
                         {
-                            Status = StatusCodes.Status400BadRequest,
+                            Status = StatusCodes.Status422UnprocessableEntity,
                             Title = "Validation failed",
-                            Type = "https://httpstatuses.com/400",
+                            Type = "https://httpstatuses.com/422",
                             Instance = httpContext.Request.Path
                         };
                         break;
@@ -62,6 +62,7 @@ namespace RestaurantManager.Api
                         Instance = httpContext.Request.Path
                     };
                     break;
+
                 case InvalidOperationException:
                     problem = new ProblemDetails
                     {
@@ -72,11 +73,6 @@ namespace RestaurantManager.Api
                         Instance = httpContext.Request.Path
                     };
                     break;
-
-                // Example custom exceptions:
-                // case NotFoundException nf:
-                //     problem = new ProblemDetails { Status = 404, Title = "Not found", Detail = nf.Message, Type = "https://httpstatuses.com/404" };
-                //     break;
 
                 default:
                     problem = new ProblemDetails

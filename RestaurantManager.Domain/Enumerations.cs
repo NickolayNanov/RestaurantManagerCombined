@@ -13,4 +13,11 @@
         Open,
         Closed
     }
+
+    public enum EmploymentType
+    {
+        PartTime,
+        FullTime,
+        Contract
+    }
 }
