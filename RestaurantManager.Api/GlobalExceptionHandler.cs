@@ -34,9 +34,9 @@ namespace RestaurantManager.Api
 
                         problem = new ValidationProblemDetails(errors)
                         {
-                            Status = StatusCodes.Status400BadRequest,
+                            Status = StatusCodes.Status422UnprocessableEntity,
                             Title = "Validation failed",
-                            Type = "https://httpstatuses.com/400",
+                            Type = "https://httpstatuses.com/422",
                             Instance = httpContext.Request.Path
                         };
                         break;

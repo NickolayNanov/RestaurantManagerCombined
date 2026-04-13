@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace RestaurantManager.Application.Handlers.Auth
 {
     public class AuthQueryValidator : ApplicationValidator<AuthQuery>
@@ -7,12 +5,12 @@ namespace RestaurantManager.Application.Handlers.Auth
         public AuthQueryValidator()
         {
             this.RuleFor(x => x.Email)
-                .Cascade(CascadeMode.Stop)
-                .NotNullNotEmptyRequired();
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
 
-                this.RuleFor(x => x.Password)
-                .Cascade(CascadeMode.Stop)
-                .NotNullNotEmptyRequired();
+            this.RuleFor(x => x.Password)
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
         }
     }
 }

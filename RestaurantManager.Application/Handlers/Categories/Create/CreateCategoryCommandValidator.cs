@@ -7,7 +7,8 @@ namespace RestaurantManager.Application.Handlers.Categories.Create
         public CreateCategoryCommandValidator()
         {
             this.RuleFor(x => x.Name)
-            .NotNullNotEmptyRequired();
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
         }
     }
 }

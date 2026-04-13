@@ -18,9 +18,9 @@ namespace RestaurantManager.Api.Controllers
         /// <summary>
          /// List employees by restaurant id.
          /// </summary>
-        [HttpGet("{restaurantId: guid}")]
-        [ProducesResponseType(typeof(IEnumerable<ListEmployeesByRestaurantResponse>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ListEmployeesByRestaurantResponse>>> ListEmployeesByRestaurant(Guid restaurantId)
+        [HttpGet("per-restaurant/{restaurantId}")]
+        [ProducesResponseType(typeof(ListEmployeesByRestaurantResponse), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ListEmployeesByRestaurantResponse>> ListEmployeesByRestaurant(Guid restaurantId)
         {
             var employees = await mediator.Send(new ListEmployeesByRestaurantQuery(restaurantId));
             return Ok(employees);

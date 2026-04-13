@@ -2,7 +2,9 @@
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using RestaurantManager.Application.Exceptions;
 using RestaurantManager.Domain;
+using RestaurantManager.Domain.Entities;
 
 namespace RestaurantManager.Application.Handlers.Employees.GetById
 {
@@ -15,7 +17,8 @@ namespace RestaurantManager.Application.Handlers.Employees.GetById
             var response = await dbContext.Employees
                 .AsNoTracking()
                 .ProjectTo<GetEmployeeByIdResponse>(mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken) ?? throw new ResourceNotFoundException(nameof(Employee), "No employee with that id exists");
+                
 
             return response;
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
 using RestaurantManager.Application.Services.Interfaces;
@@ -16,7 +17,7 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
     {
         public async Task<UpdateEmployeeResponse> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            var employee = await dbContext.Employees.FindAsync(request.Id, cancellationToken);
+            var employee = await dbContext.Employees.AsNoTracking().FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
             if (employee is null)
             {
@@ -35,7 +36,7 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
             dbContext.Employees.Update(employeeEntity);
             logger.LogInformation($"Updated employee with id: {request.Id}");
 
-            var response = mapper.Map<UpdateEmployeeResponse>(request);
+            var response = mapper.Map<UpdateEmployeeResponse>(employeeEntity);
 
             return response;
         }

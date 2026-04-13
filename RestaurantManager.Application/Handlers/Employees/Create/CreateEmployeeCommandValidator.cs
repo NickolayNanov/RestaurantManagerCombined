@@ -12,19 +12,22 @@ namespace RestaurantManager.Application.Handlers.Employees.Create
                 .NotNullNotEmptyRequired();
 
             this.RuleFor(x => x.Email)
-                .NotNullNotEmptyRequired();
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
 
             this.RuleFor(x => x.Name)
-                .NotNullNotEmptyRequired();
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
 
             this.RuleFor(x => x.Position)
-                .NotNullNotEmptyRequired();
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
 
             this.RuleFor(x => x.PhoneNumber)
-                .NotNullNotEmptyRequired();
+                .NotNullNotEmptyRequired()
+                .StringLengthBetween(3, 100);
 
-            this.RuleFor(x => x.EmploymentType)
-                .NotNullNotEmptyRequired();
+            ValidatorsExtensions.IsInEnum(this.RuleFor(x => x.EmploymentType));
 
             this.RuleFor(x => x.Salary)
                 .GreaterThanZero()
