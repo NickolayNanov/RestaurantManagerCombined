@@ -14,6 +14,9 @@ namespace RestaurantManager.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
+            ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop;
+            ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Stop;
+
             // automapper
             services.AddAutoMapper(typeof(RestaurantsApplicationProfile).Assembly);
 
