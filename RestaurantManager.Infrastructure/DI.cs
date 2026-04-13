@@ -10,22 +10,30 @@ using System.Text;
 using System.Security.Claims;
 using RestaurantManager.Domain.Entities;
 using RestaurantManager.Infrastructure.EF;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace RestaurantManager.Infrastructure
 {
     public static class DI
     {
-        public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static void AddInfrastructure(this IServiceCollection services,
+            IConfiguration configuration,
+            IWebHostEnvironment env)
         {
             services
-                .AddPersistence(configuration)
+                .AddPersistence(configuration, env)
                 .AddIdentityAndRoles(configuration);
         }
 
-        private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddPersistence(this IServiceCollection services,
+            IConfiguration configuration,
+            IWebHostEnvironment env)
         {
+            var connectionStringName = env.IsProduction() ? "Production" : "Local";
+
             services.AddDbContext<IRestaurantManagerDbContext, RestaurantManagerDbContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("Local"),
+                    options.UseSqlServer(configuration.GetConnectionString(connectionStringName),
                     b => b.MigrationsAssembly(typeof(RestaurantManagerDbContext).Assembly.GetName().Name)));
 
             return services;
