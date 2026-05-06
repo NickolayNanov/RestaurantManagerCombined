@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
+using RestaurantManager.Application.Services;
 using RestaurantManager.Application.Services.Interfaces;
 using RestaurantManager.Domain;
 using RestaurantManager.Domain.Entities;
@@ -11,6 +12,7 @@ namespace RestaurantManager.Application.Handlers.Employees.Create
     internal class CreateEmployeeHandler(
         IMapper mapper,
         ICurrentUserService currentUserService,
+        IImageUploadService imageUploadService,
         ILogger<CreateEmployeeHandler> logger,
         IRestaurantManagerDbContext dbContext) : IRequestHandler<CreateEmployeeCommand, CreateEmployeeResponse>
     {
@@ -25,6 +27,7 @@ namespace RestaurantManager.Application.Handlers.Employees.Create
             }
 
             var employeeEntity = mapper.Map<Employee>(request);
+            employeeEntity.ImgUrl = await imageUploadService.UploadAsync(request.Image, ImageUploadFolders.Employees, cancellationToken);
 
             employeeEntity.CreatedAt = DateTime.UtcNow;
             employeeEntity.CreatedBy = currentUserService.UserId;

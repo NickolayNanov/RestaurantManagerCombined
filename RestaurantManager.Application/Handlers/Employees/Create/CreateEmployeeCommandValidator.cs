@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using RestaurantManager.Application.Handlers.Auth;
+using RestaurantManager.Application.Services;
 using RestaurantManager.Domain;
 
 namespace RestaurantManager.Application.Handlers.Employees.Create
@@ -29,9 +30,19 @@ namespace RestaurantManager.Application.Handlers.Employees.Create
 
             ValidatorsExtensions.IsInEnum(this.RuleFor(x => x.EmploymentType));
 
+            ValidatorsExtensions.IsInEnum(this.RuleFor(x => x.Status));
+
             this.RuleFor(x => x.Salary)
                 .GreaterThanZero()
                 .NotNullNotEmptyRequired();
+
+            this.RuleFor(x => x.Image)
+                .NotNull()
+                .WithMessage("The field Image is required.")
+                .Must(ImageValidation.HasAllowedContentType)
+                .WithMessage("Image must be a JPEG, PNG, or WEBP file.")
+                .Must(x => x is not null && x.Length <= ImageValidation.MaxFileSize)
+                .WithMessage("Image must be 5 MB or smaller.");
         }
     }
 }

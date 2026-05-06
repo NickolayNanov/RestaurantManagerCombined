@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
+using RestaurantManager.Application.Services;
 using RestaurantManager.Application.Services.Interfaces;
 using RestaurantManager.Domain;
 using RestaurantManager.Domain.Entities;
@@ -13,7 +14,8 @@ namespace RestaurantManager.Application.Handlers.MenuItems.Create
         IRestaurantManagerDbContext dbContext,
         IMapper mapper,
         ICurrentUserService currentUserService,
-        ILogger<CreateMenuItemHandler> logger) : IRequestHandler<CreateMenuItemCommand, CreateMenuItemResponse>
+        ILogger<CreateMenuItemHandler> logger,
+        IImageUploadService imageUploadService) : IRequestHandler<CreateMenuItemCommand, CreateMenuItemResponse>
     {
         public async Task<CreateMenuItemResponse> Handle(CreateMenuItemCommand request, CancellationToken cancellationToken)
         {
@@ -34,6 +36,10 @@ namespace RestaurantManager.Application.Handlers.MenuItems.Create
             }
 
             var menuItem = mapper.Map<MenuItem>(request);
+            menuItem.ImgUrl = await imageUploadService.UploadAsync(
+                request.Image,
+                ImageUploadFolders.MenuItems,
+                cancellationToken);
 
             menuItem.CreatedAt = DateTime.UtcNow;
             menuItem.CreatedBy = currentUserService.UserId;

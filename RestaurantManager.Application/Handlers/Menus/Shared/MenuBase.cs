@@ -8,8 +8,6 @@ namespace RestaurantManager.Application.Handlers.Menus.Shared
 
         public string Description { get; set; }
 
-        public string ImgUrl { get; set; }
-
         public bool IsActive { get; set; }
 
         public MenuType Type { get; set; }

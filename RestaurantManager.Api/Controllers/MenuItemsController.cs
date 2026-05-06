@@ -1,6 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantManager.Api.Requests;
 using RestaurantManager.Application.Handlers.MenuItems.Create;
 using RestaurantManager.Application.Handlers.MenuItems.Delete;
 using RestaurantManager.Application.Handlers.MenuItems.GetById;
@@ -17,9 +18,6 @@ namespace RestaurantManager.Api.Controllers
     [Produces("application/json")]
     public class MenuItemsController(IMediator mediator) : ControllerBase
     {
-        /// <summary>
-        /// List menu items.
-        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GetManyMenuItemsResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetManyMenuItemsResponse>>> GetAll()
@@ -28,9 +26,6 @@ namespace RestaurantManager.Api.Controllers
             return Ok(menus);
         }
 
-        /// <summary>
-        /// Get a menu item by id.
-        /// </summary>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(GetMenuItemByIdResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -40,9 +35,6 @@ namespace RestaurantManager.Api.Controllers
             return Ok(menu);
         }
 
-        /// <summary>
-        /// Get a menu items by menu id.
-        /// </summary>
         [HttpGet("by-menu/{menuId:guid}")]
         [ProducesResponseType(typeof(GetMenuByIdResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,40 +44,53 @@ namespace RestaurantManager.Api.Controllers
             return Ok(menu);
         }
 
-        /// <summary>
-        /// Create a menu item.
-        /// </summary>
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(CreateMenuItemResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateMenuItemResponse>> Create([FromBody] CreateMenuItemCommand command)
+        public async Task<ActionResult<CreateMenuItemResponse>> Create([FromForm] CreateMenuItemFormRequest request, CancellationToken ct)
         {
-            var result = await mediator.Send(command);
+            var command = new CreateMenuItemCommand
+            {
+                Name = request.Name,
+                Price = request.Price,
+                IsActive = request.IsActive,
+                MenuId = request.MenuId,
+                CategoryId = request.CategoryId,
+                Image = request.Image.ToUploadFile()
+            };
+
+            var result = await mediator.Send(command, ct);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Full update (replace) of a menu item.
-        /// </summary>
         [HttpPut]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update([FromBody] UpdateMenuItemCommand command)
+        public async Task<IActionResult> Update([FromForm] UpdateMenuItemFormRequest request, CancellationToken ct)
         {
-            await mediator.Send(command);
+            var command = new UpdateMenuItemCommand
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Price = request.Price,
+                IsActive = request.IsActive,
+                CategoryId = request.CategoryId,
+                Image = request.Image.ToUploadFile()
+            };
+
+            await mediator.Send(command, ct);
             return NoContent();
         }
 
-        /// <summary>
-        /// Delete a menu item by id.
-        /// </summary>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
         {
-            await mediator.Send(new DeleteMenuItemCommand(id));
+            await mediator.Send(new DeleteMenuItemCommand(id), ct);
             return NoContent();
         }
     }

@@ -1,7 +1,5 @@
 1. BE: Create register page and wire endpoints;
-3. FE: Wire the staff members UI to the endpoints;
 4. BE: Create MonthlyReports(per restaurant) table with fields like income, expenses, dates with controllers and handlers;
-- name, email, employmentContractType, Position, Salary, status, phone;
 5. FE: Create monthly restaurant reports design;
 6. BE: Create MontylyRestaurantReport table crud controllers and handlers (additional get endpoints for more complex queries);
 - fromDate, toDate, Month, income, expense, notes

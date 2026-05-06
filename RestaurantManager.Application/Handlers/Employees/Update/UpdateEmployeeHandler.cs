@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
+using RestaurantManager.Application.Services;
 using RestaurantManager.Application.Services.Interfaces;
 using RestaurantManager.Domain;
 using RestaurantManager.Domain.Entities;
@@ -12,6 +13,7 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
     internal class UpdateEmployeeHandler(
         IMapper mapper,
         ICurrentUserService currentUserService,
+        IImageUploadService imageUploadService,
         ILogger<UpdateEmployeeHandler> logger,
         IRestaurantManagerDbContext dbContext) : IRequestHandler<UpdateEmployeeCommand, UpdateEmployeeResponse>
     {
@@ -29,7 +31,10 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
 
             employeeEntity.RestaurantId = employee.RestaurantId;
             employeeEntity.CreatedAt = employee.CreatedAt;
-            employeeEntity.CreatedBy = currentUserService.UserId;
+            employeeEntity.CreatedBy = employee.CreatedBy;
+            employeeEntity.ImgUrl = request.Image is null
+                ? employee.ImgUrl
+                : await imageUploadService.UploadAsync(request.Image, ImageUploadFolders.Employees, cancellationToken);
             employeeEntity.UpdatedBy = currentUserService.UserId;
             employeeEntity.UpdatedAt = DateTime.UtcNow;
 

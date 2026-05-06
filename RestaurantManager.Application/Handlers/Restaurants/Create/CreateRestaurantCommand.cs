@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using RestaurantManager.Application.Services.Models;
 using RestaurantManager.Domain;
 
 namespace RestaurantManager.Application.Handlers.Restaurants.Create
@@ -15,6 +16,6 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Create
 
         public OpenClosed Status { get; set; }
 
-        public string ImgUrl { get; set; }
+        public UploadFile Image { get; set; }
     }
 }

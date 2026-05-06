@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantManager.Api.Requests;
 using RestaurantManager.Application.Handlers.Employees.Create;
 using RestaurantManager.Application.Handlers.Employees.Delete;
 using RestaurantManager.Application.Handlers.Employees.GetById;
@@ -39,32 +40,60 @@ namespace RestaurantManager.Api.Controllers
         }
 
         /// <summary>
-        /// Create a menu.
+        /// Create an employee.
         /// </summary>
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(CreateEmployeeResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateEmployeeResponse>> Create([FromBody] CreateEmployeeCommand command)
+        public async Task<ActionResult<CreateEmployeeResponse>> Create([FromForm] CreateEmployeeFormRequest request)
         {
+            var command = new CreateEmployeeCommand
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Position = request.Position,
+                EmploymentType = request.EmploymentType,
+                Status = request.Status,
+                Salary = request.Salary,
+                PhoneNumber = request.PhoneNumber,
+                RestaurantId = request.RestaurantId,
+                Image = request.Image.ToUploadFile()
+            };
+
             var result = await mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         /// <summary>
-        /// Full update (replace) of a menu.
+        /// Full update (replace) of an employee.
         /// </summary>
         [HttpPut]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update([FromBody] UpdateEmployeeCommand command)
+        public async Task<IActionResult> Update([FromForm] UpdateEmployeeFormRequest request)
         {
+            var command = new UpdateEmployeeCommand
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Email = request.Email,
+                Position = request.Position,
+                EmploymentType = request.EmploymentType,
+                Status = request.Status,
+                Salary = request.Salary,
+                PhoneNumber = request.PhoneNumber,
+                Image = request.Image.ToUploadFile()
+            };
+
             await mediator.Send(command);
             return NoContent();
         }
 
         /// <summary>
-        /// Delete a menu by id.
+        /// Delete an employee by id.
         /// </summary>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

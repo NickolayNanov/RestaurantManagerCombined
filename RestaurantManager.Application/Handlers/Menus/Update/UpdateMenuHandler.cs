@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RestaurantManager.Application.Exceptions;
 using RestaurantManager.Application.Handlers.Menus.Create;
+using RestaurantManager.Application.Services;
 using RestaurantManager.Application.Services.Interfaces;
 using RestaurantManager.Domain;
 using RestaurantManager.Domain.Entities;
@@ -14,25 +15,33 @@ namespace RestaurantManager.Application.Handlers.Menus.Update
         IRestaurantManagerDbContext dbContext,
         IMapper mapper,
         ICurrentUserService currentUserService,
-        ILogger<CreateMenuHandler> logger) : IRequestHandler<UpdateMenuCommand, UpdateMenuResponse>
+        ILogger<CreateMenuHandler> logger,
+        IImageUploadService imageUploadService) : IRequestHandler<UpdateMenuCommand, UpdateMenuResponse>
     {
         public async Task<UpdateMenuResponse> Handle(UpdateMenuCommand request, CancellationToken cancellationToken)
         {
-            var menu = await dbContext.Menus.AsNoTracking().FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken)
+            var menu = await dbContext.Menus.FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken)
                 ?? throw new ResourceNotFoundException(nameof(Menu), $"Menu with id {request.Id} was not found when trying to update.");
 
-            var entity = mapper.Map<Menu>(request);
+            menu.Name = request.Name;
+            menu.Description = request.Description;
+            menu.IsActive = request.IsActive;
+            menu.Type = request.Type;
+            menu.UpdatedAt = DateTime.UtcNow;
+            menu.UpdatedBy = currentUserService.UserId;
 
-            entity.RestaurantId = menu.RestaurantId;
-            entity.CreatedBy = menu.CreatedBy;
-            entity.CreatedAt = menu.CreatedAt;
-            entity.UpdatedAt = DateTime.UtcNow;
-            entity.UpdatedBy = currentUserService.UserId;
+            if (request.Image is not null)
+            {
+                menu.ImgUrl = await imageUploadService.UploadAsync(
+                    request.Image,
+                    ImageUploadFolders.Menus,
+                    cancellationToken);
+            }
 
-            dbContext.Menus.Update(entity);
+            dbContext.Menus.Update(menu);
 
-            logger.LogInformation($"Updated menu with id {entity.Id}.");
-            var response = mapper.Map<UpdateMenuResponse>(entity);
+            logger.LogInformation($"Updated menu with id {menu.Id}.");
+            var response = mapper.Map<UpdateMenuResponse>(menu);
 
             return response;
         }

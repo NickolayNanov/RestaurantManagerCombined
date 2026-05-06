@@ -27,7 +27,13 @@ namespace RestaurantManager.Infrastructure.EF.EntityConfigurations
             builder.Property(e => e.EmploymentType)
                 .IsRequired();
 
+            builder.Property(e => e.Status)
+                .IsRequired();
+
             builder.Property(e => e.Salary)
+                .IsRequired();
+
+            builder.Property(e => e.ImgUrl)
                 .IsRequired();
 
             builder.HasOne(e => e.Restaurant)
