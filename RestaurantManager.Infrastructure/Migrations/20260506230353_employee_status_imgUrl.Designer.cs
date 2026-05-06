@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantManager.Infrastructure;
 
@@ -11,9 +12,11 @@ using RestaurantManager.Infrastructure;
 namespace RestaurantManager.Infrastructure.Migrations
 {
     [DbContext(typeof(RestaurantManagerDbContext))]
-    partial class RestaurantManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506230353_employee_status_imgUrl")]
+    partial class employee_status_imgUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
