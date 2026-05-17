@@ -17,6 +17,8 @@ namespace RestaurantManager.Domain
 
         public DbSet<ProfileDetails> ProfileDetails { get; set; }
 
+        public DbSet<RestaurantMonthlyReport> RestaurantMonthlyReports { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken ct = default);
 
         int SaveChanges();
