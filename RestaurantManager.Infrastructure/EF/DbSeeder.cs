@@ -32,7 +32,8 @@ namespace RestaurantManager.Infrastructure.EF
             // Your Restaurant.OwnerId points to Identity user id (string). Since you didn’t provide ApplicationUser,
             // we seed with stable string ids. If you prefer real Identity users via UserManager<ApplicationUser>,
             // tell me and I’ll adapt.
-            const string owner1 = "46f1b387-d335-4231-97a8-9c40ce676240";
+            const string owner1 = "6795613f-83de-4ef4-89fa-1d50c2e228c2";
+            const string owner2 = "48afd214-a145-4683-ab8b-3d988b62fe9a";
 
             // --------------------------
             // Categories (shared)
