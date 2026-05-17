@@ -80,6 +80,17 @@ namespace RestaurantManager.Api.Requests
         public IFormFile Image { get; set; }
     }
 
+    public sealed class UpdateUserDetailsFormRequest
+    {
+        public string UserId { get; set; }
+        public string FirstName { get; set; }
+        public string Surname { get; set; }
+        public string LastName { get; set; }
+        public string CompanyName { get; set; }
+        public string PhoneNumber { get; set; }
+        public IFormFile Image { get; set; }
+    }
+
     public static class FormFileExtensions
     {
         public static UploadFile ToUploadFile(this IFormFile file)

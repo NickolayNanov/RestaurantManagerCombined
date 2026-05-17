@@ -1,12 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using RestaurantManager.Application.Handlers.UserDetails.Create;
 using RestaurantManager.Domain;
 
 namespace RestaurantManager.Application.Handlers.Users.Create
 {
     internal class CreateUserHandler(
         ILogger<CreateUserHandler> logger,
+        IMediator mediator,
         UserManager<ApplicationUser> userManager
         ) : IRequestHandler<CreateUserCommand, CreateUserResponse>
     {
@@ -33,6 +35,8 @@ namespace RestaurantManager.Application.Handlers.Users.Create
                 logger.LogError("Failed to assign Owner role to user: {Username}", request.Username);
                 throw new InvalidOperationException("Failed to assign user role: " + string.Join(", ", roleResult.Errors.Select(e => e.Description)));
             }
+
+            await mediator.Send(new CreateProfileDetailsCommand { UserId = user.Id }, cancellationToken);
 
             return new CreateUserResponse { Id = user.Id, Username = user.UserName };
         }
