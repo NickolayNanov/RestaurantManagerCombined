@@ -23,11 +23,16 @@ namespace RestaurantManager.Application.Handlers.Users.Create
 
             if (!creationResult.Succeeded)
             {
-                logger.LogError("Created failed to be created");
+                logger.LogError("User failed to be created");
                 throw new InvalidOperationException("Failed to create user: " + string.Join(", ", creationResult.Errors.Select(e => e.Description)));
             }
 
-            await userManager.AddToRoleAsync(user, "Owner");
+            var roleResult = await userManager.AddToRoleAsync(user, "Owner");
+            if (!roleResult.Succeeded)
+            {
+                logger.LogError("Failed to assign Owner role to user: {Username}", request.Username);
+                throw new InvalidOperationException("Failed to assign user role: " + string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            }
 
             return new CreateUserResponse { Id = user.Id, Username = user.UserName };
         }

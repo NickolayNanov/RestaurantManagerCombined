@@ -13,6 +13,8 @@ namespace RestaurantManager.Application.Handlers.Users.Create
 
             this.RuleFor(x => x.Email)
                 .NotNullNotEmptyRequired()
+                .EmailAddress()
+                    .WithMessage("Email must be a valid email address.")
                 .StringLengthBetween(3, 100);
 
             this.RuleFor(x => x.Password)
