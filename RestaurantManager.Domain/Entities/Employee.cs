@@ -10,9 +10,13 @@
 
         public EmploymentType EmploymentType { get; set; }
 
+        public EmployeeStatus Status { get; set; }
+
         public decimal Salary { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public string ImgUrl { get; set; }
 
         public Guid RestaurantId { get; set; }
 

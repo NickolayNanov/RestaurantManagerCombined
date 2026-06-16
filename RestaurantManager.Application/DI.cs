@@ -18,7 +18,7 @@ namespace RestaurantManager.Application
             ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Stop;
 
             // automapper
-            services.AddAutoMapper(typeof(RestaurantsApplicationProfile).Assembly);
+            services.AddAutoMapper(_ => { }, typeof(RestaurantsApplicationProfile).Assembly);
 
             // fluent validation
             services.AddValidatorsFromAssemblyContaining<CreateRestaurantCommandValidator>();

@@ -7,6 +7,8 @@ namespace RestaurantManager.Application.Handlers.Menus.GetById
     {
         public Guid Id { get; set; }
 
+        public string ImgUrl { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public string CreatedBy { get; set; }

@@ -6,6 +6,8 @@ namespace RestaurantManager.Application.Handlers.MenuItems.Update
     {
         public Guid Id { get; set; }
 
+        public string ImgUrl { get; set; }
+
         public Guid MenuId { get; set; }
 
         public Guid CategoryId { get; set; }

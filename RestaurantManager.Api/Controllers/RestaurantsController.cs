@@ -1,6 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantManager.Api.Requests;
 using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Restaurants.Delete;
 using RestaurantManager.Application.Handlers.Restaurants.GetAllRestaurantInfos;
@@ -17,12 +18,6 @@ namespace RestaurantManager.Api.Controllers
     [Produces("application/json")]
     public class RestaurantsController(IMediator mediator) : ControllerBase
     {
-        /// <summary>
-        /// List restaurants (supports basic pagination via skip/take).
-        /// </summary>
-        /// <remarks>
-        /// GET /api/restaurants?skip=0&take=20
-        /// </remarks>
         [HttpGet("info")]
         [ProducesResponseType(typeof(IEnumerable<GetAllRestaurantInfosResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GetAllRestaurantInfosResponse>>> GetAllRestaurantInfos()
@@ -31,9 +26,6 @@ namespace RestaurantManager.Api.Controllers
             return Ok(items);
         }
 
-        /// <summary>
-        /// Get a restaurant's info by id.
-        /// </summary>
         [HttpGet("info/{id:guid}")]
         [ProducesResponseType(typeof(GetRestaurantInfoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,9 +35,6 @@ namespace RestaurantManager.Api.Controllers
             return Ok(entity);
         }
 
-        /// <summary>
-        /// Get a restaurant by id.
-        /// </summary>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(GetRestaurantByIdResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -55,10 +44,7 @@ namespace RestaurantManager.Api.Controllers
             return Ok(entity);
         }
 
-        /// <summary>
-        /// Get a restaurant by id.
-        /// </summary>
-        [HttpGet()]
+        [HttpGet]
         [ProducesResponseType(typeof(GetOwnersRestaurantsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetOwnersRestaurantsResponse>> GetOwnersRestaurants()
@@ -67,40 +53,55 @@ namespace RestaurantManager.Api.Controllers
             return Ok(entity);
         }
 
-        /// <summary>
-        /// Create a restaurant.
-        /// </summary>
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(CreateRestaurantResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromBody] CreateRestaurantCommand command)
+        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromForm] CreateRestaurantFormRequest request, CancellationToken ct)
         {
-            var result = await mediator.Send(command);
+            var command = new CreateRestaurantCommand
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Location = request.Location,
+                Cuisine = request.Cuisine,
+                Status = request.Status,
+                Image = request.Image.ToUploadFile()
+            };
+
+            var result = await mediator.Send(command, ct);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>
-        /// Full update (replace) of a restaurant.
-        /// </summary>
         [HttpPut]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update([FromBody] UpdateRestaurantCommand dto)
+        public async Task<IActionResult> Update([FromForm] UpdateRestaurantFormRequest request, CancellationToken ct)
         {
-            await mediator.Send(dto);
+            var command = new UpdateRestaurantCommand
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Description = request.Description,
+                Location = request.Location,
+                Cuisine = request.Cuisine,
+                Status = request.Status,
+                OwnerId = request.OwnerId,
+                Image = request.Image.ToUploadFile()
+            };
+
+            await mediator.Send(command, ct);
             return NoContent();
         }
 
-        /// <summary>
-        /// Delete a restaurant.
-        /// </summary>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
         {
-            await mediator.Send(new DeleteRestaurantCommand(id));
+            await mediator.Send(new DeleteRestaurantCommand(id), ct);
             return NoContent();
         }
     }

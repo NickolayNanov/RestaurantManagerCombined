@@ -18,6 +18,8 @@
 
         public virtual IEnumerable<Employee> Employees { get; set; }
 
+        public virtual IEnumerable<RestaurantMonthlyReport> MonthlyReports { get; set; } = new HashSet<RestaurantMonthlyReport>();
+
         public string OwnerId { get; set; }
 
         public ApplicationUser Owner { get; set; }

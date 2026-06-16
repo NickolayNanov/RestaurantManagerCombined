@@ -20,4 +20,12 @@
         FullTime,
         Contract
     }
+
+    public enum EmployeeStatus
+    {
+        Active,
+        OnLeave,
+        Paused,
+        Inactive
+    }
 }

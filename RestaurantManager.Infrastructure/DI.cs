@@ -12,6 +12,8 @@ using RestaurantManager.Domain.Entities;
 using RestaurantManager.Infrastructure.EF;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using RestaurantManager.Application.Services.Interfaces;
+using RestaurantManager.Infrastructure.Cloudinary;
 
 namespace RestaurantManager.Infrastructure
 {
@@ -23,7 +25,8 @@ namespace RestaurantManager.Infrastructure
         {
             services
                 .AddPersistence(configuration, env)
-                .AddIdentityAndRoles(configuration);
+                .AddIdentityAndRoles(configuration)
+                .AddCloudinary(configuration);
         }
 
         private static IServiceCollection AddPersistence(this IServiceCollection services,
@@ -98,6 +101,14 @@ namespace RestaurantManager.Infrastructure
             {
                 options.AddPolicy("Admins", policy => policy.RequireRole("Admin"));
             });
+
+            return services;
+        }
+
+        private static IServiceCollection AddCloudinary(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CloudinaryOptions>(configuration.GetSection("Cloudinary"));
+            services.AddScoped<IImageUploadService, CloudinaryImageUploadService>();
 
             return services;
         }

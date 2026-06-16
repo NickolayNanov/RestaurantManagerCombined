@@ -8,6 +8,8 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
 
         public Guid RestaurantId { get; set; }
 
+        public string ImgUrl { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public string CreatedBy { get; set; }

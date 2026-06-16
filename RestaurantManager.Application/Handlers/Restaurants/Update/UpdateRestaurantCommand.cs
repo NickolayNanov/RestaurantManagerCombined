@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using RestaurantManager.Application.Services.Models;
 using RestaurantManager.Domain;
 
 namespace RestaurantManager.Application.Handlers.Restaurants.Update
@@ -17,7 +18,7 @@ namespace RestaurantManager.Application.Handlers.Restaurants.Update
 
         public OpenClosed Status { get; set; }
 
-        public string ImgUrl { get; set; }
+        public UploadFile Image { get; set; }
 
         // public virtual IEnumerable<Menu> Menus { get; set; } = new HashSet<Menu>();
 

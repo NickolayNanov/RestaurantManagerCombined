@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using RestaurantManager.Application.Handlers.Auth;
+using RestaurantManager.Application.Services;
 
 namespace RestaurantManager.Application.Handlers.Employees.Update
 {
@@ -28,9 +29,17 @@ namespace RestaurantManager.Application.Handlers.Employees.Update
 
             ValidatorsExtensions.IsInEnum(this.RuleFor(x => x.EmploymentType));
 
+            ValidatorsExtensions.IsInEnum(this.RuleFor(x => x.Status));
+
             this.RuleFor(x => x.Salary)
                 .GreaterThanZero()
                 .NotNullNotEmptyRequired();
+
+            this.RuleFor(x => x.Image)
+                .Must(x => x is null || ImageValidation.HasAllowedContentType(x))
+                .WithMessage("Image must be a JPEG, PNG, or WEBP file.")
+                .Must(x => x is null || x.Length <= ImageValidation.MaxFileSize)
+                .WithMessage("Image must be 5 MB or smaller.");
         }
     }
 }

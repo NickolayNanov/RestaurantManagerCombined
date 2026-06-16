@@ -98,7 +98,7 @@ namespace RestaurantManager.Application.Handlers.Auth
         public static IRuleBuilderOptions<T, TProperty> IsInEnum<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder)
             where TProperty : struct, Enum
         {
-            return ruleBuilder.IsInEnum()
+            return DefaultValidatorExtensions.IsInEnum(ruleBuilder)
                 .WithMessage((t, tProp) => GetEnumErrorMessage<TProperty>());
         }
 
@@ -137,6 +137,5 @@ namespace RestaurantManager.Application.Handlers.Auth
         }
     }
 }
-
 
 

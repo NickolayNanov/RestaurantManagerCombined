@@ -12,6 +12,8 @@ namespace RestaurantManager.Application.Handlers.Employees.Shared
 
         public EmploymentType EmploymentType { get; set; }
 
+        public EmployeeStatus Status { get; set; }
+
         public decimal Salary { get; set; }
 
         public string PhoneNumber { get; set; }

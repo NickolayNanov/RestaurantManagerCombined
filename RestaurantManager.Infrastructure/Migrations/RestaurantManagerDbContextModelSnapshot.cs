@@ -271,6 +271,10 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.Property<int>("EmploymentType")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImgUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -291,6 +295,9 @@ namespace RestaurantManager.Infrastructure.Migrations
 
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -399,6 +406,60 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.ToTable("MenuItems");
                 });
 
+            modelBuilder.Entity("RestaurantManager.Domain.Entities.ProfileDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CompanyName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Surname")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ProfileDetails");
+                });
+
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Restaurant", b =>
                 {
                     b.Property<Guid>("Id")
@@ -450,6 +511,47 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Restaurants");
+                });
+
+            modelBuilder.Entity("RestaurantManager.Domain.Entities.RestaurantMonthlyReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Revenue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId", "Year", "Month")
+                        .IsUnique();
+
+                    b.ToTable("RestaurantMonthlyReports");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -544,6 +646,17 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.Navigation("Menu");
                 });
 
+            modelBuilder.Entity("RestaurantManager.Domain.Entities.ProfileDetails", b =>
+                {
+                    b.HasOne("RestaurantManager.Domain.ApplicationUser", "User")
+                        .WithOne("ProfileDetails")
+                        .HasForeignKey("RestaurantManager.Domain.Entities.ProfileDetails", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("RestaurantManager.Domain.Entities.Restaurant", b =>
                 {
                     b.HasOne("RestaurantManager.Domain.ApplicationUser", "Owner")
@@ -554,8 +667,21 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("RestaurantManager.Domain.Entities.RestaurantMonthlyReport", b =>
+                {
+                    b.HasOne("RestaurantManager.Domain.Entities.Restaurant", "Restaurant")
+                        .WithMany("MonthlyReports")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("RestaurantManager.Domain.ApplicationUser", b =>
                 {
+                    b.Navigation("ProfileDetails");
+
                     b.Navigation("Restaurants");
                 });
 
@@ -574,6 +700,8 @@ namespace RestaurantManager.Infrastructure.Migrations
                     b.Navigation("Employees");
 
                     b.Navigation("Menus");
+
+                    b.Navigation("MonthlyReports");
                 });
 #pragma warning restore 612, 618
         }

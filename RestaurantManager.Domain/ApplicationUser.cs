@@ -6,5 +6,7 @@ namespace RestaurantManager.Domain
     public class ApplicationUser : IdentityUser
     {
         public IEnumerable<Restaurant> Restaurants { get; set; } = new HashSet<Restaurant>();
+
+        public ProfileDetails ProfileDetails { get; set; }
     }
 }

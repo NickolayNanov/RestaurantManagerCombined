@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RestaurantManager.Application.Handlers.Restaurants.Create;
 using RestaurantManager.Application.Handlers.Users.Create;
 using RestaurantManager.Application.Handlers.Users.GetById;
 using RestaurantManager.Application.Handlers.Users.UserInfo;
@@ -20,16 +19,16 @@ namespace RestaurantManager.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(CreateRestaurantResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(CreateUserResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateRestaurantResponse>> Create([FromBody] CreateUserCommand dto)
+        public async Task<ActionResult<CreateUserResponse>> Create([FromBody] CreateUserCommand dto)
         {
             var result = await mediator.Send(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(CreateRestaurantResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(GetUserByIdResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<GetUserByIdResponse>> GetById(string id)
         {
