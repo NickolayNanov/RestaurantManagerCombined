@@ -39,7 +39,7 @@ namespace RestaurantManager.Application.Handlers.Dashboard.PerformanceAnalytics
                 })
                 .ToListAsync(cancellationToken);
 
-            var response = monthBuckets.Select(month =>
+            var months = monthBuckets.Select(month =>
             {
                 var aggregate = aggregates.FirstOrDefault(x => x.Year == month.Year && x.Month == month.Month);
                 return new PerformanceAnalyticsMonthResponse(
@@ -48,9 +48,14 @@ namespace RestaurantManager.Application.Handlers.Dashboard.PerformanceAnalytics
                     month.Label,
                     aggregate?.Revenue ?? 0,
                     aggregate?.Rating);
-            });
+            }).ToList();
 
-            return new GetPerformanceAnalyticsResponse(response);
+            var revenueMonths = aggregates.Where(x => x.Revenue > 0).ToList();
+            var averageMonthlyRevenue = revenueMonths.Count == 0
+                ? 0
+                : revenueMonths.Sum(x => x.Revenue) / revenueMonths.Count;
+
+            return new GetPerformanceAnalyticsResponse(months, averageMonthlyRevenue);
         }
     }
 }
